@@ -42,11 +42,12 @@ void main() {
 	while (running) {
 		menu.ShowMenu();
 		menu.Navigation(&running);
-		if (menu.currentID == "1") {
-			char* buf = _strdup(menu.currentID.c_str());
-			send(s, buf, 100, 0);
+		if (menu.currentID == "2") {
+			char buf[100];
+			strcpy(buf, menu.currentID.c_str());
+			send(s, buf, sizeof(buf), 0);
 			*buf = '\0';
-
+			cout << "ДОШЛО до СЮДА";
 			if (recv(s, buf, sizeof(buf), 0) != 0)
 			{
 				system("cls");

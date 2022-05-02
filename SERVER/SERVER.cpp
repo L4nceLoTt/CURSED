@@ -20,11 +20,13 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	char buf1[100];
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
-		if (strcmp(buf, "1")) {
-			strcat(buf1, "янях уси");
+		
+		if (!strcmp(buf, "2")) {
+			strcpy(buf1, "янях уси");
 			send(s2, buf1, sizeof(buf1), 0);
 		}
 	}
+	
 	closesocket(s2);
 	return 0;
 }

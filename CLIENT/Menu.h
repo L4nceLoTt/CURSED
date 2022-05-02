@@ -106,7 +106,7 @@ public:
 		else if (keycap == 72) main->paragraph--;
 		else if (keycap == 13) {
 			if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr != NULL) main = &main->sub[main->paragraph - 1];
-			else if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr == NULL) currentID = MakeID(main);
+			else if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr == NULL) currentID = MakeID(&main->sub[paragraph- 1]);
 			else if (main->function[main->paragraph - 1] != NULL) {
 				system("cls");
 				main->function[main->paragraph - 1]();
