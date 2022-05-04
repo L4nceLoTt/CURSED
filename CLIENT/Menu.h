@@ -25,9 +25,9 @@ public:
 
 	Menu() { countParam = 0; paragraph = 1; arr = NULL; border = 0; sub = NULL; id = "0"; }
 
-	string MakeID(Menu* ptr) {
+ 	string MakeID(Menu* ptr) {
 		if (ptr->parent != NULL) {
-			return  ptr->id += MakeID(ptr->parent);
+			return MakeID(ptr->parent) + ptr->id;
 		}
 		return "\0";
 	}
@@ -100,13 +100,14 @@ public:
 	}
 
 	void Navigation(bool* running) {
+		currentID = "0";
 		char keycap = _getch();
 
 		if (keycap == 80) main->paragraph++;
 		else if (keycap == 72) main->paragraph--;
 		else if (keycap == 13) {
 			if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr != NULL) main = &main->sub[main->paragraph - 1];
-			else if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr == NULL) currentID = MakeID(&main->sub[paragraph- 1]);
+			else if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr == NULL) currentID = MakeID(&main->sub[main->paragraph- 1]);
 			else if (main->function[main->paragraph - 1] != NULL) {
 				system("cls");
 				main->function[main->paragraph - 1]();

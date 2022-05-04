@@ -13,25 +13,87 @@
 
 using namespace std;
 
+int numcl = 0;
+
 DWORD WINAPI ThreadFunc(LPVOID client_socket)
 {
+	int num = numcl;
 	SOCKET s2 = ((SOCKET*)client_socket)[0];
 	char buf[100];
 	char buf1[100];
+	char lbuf[100];
+	char pbuf[100];
+	char boolbuf[100];
+
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
 		
-		if (!strcmp(buf, "2")) {
-			strcpy(buf1, "—ќ—» ’”…");
+		if (!strcmp(buf, "1")) {
+			recv(s2, lbuf, sizeof(lbuf), 0);
+			recv(s2, pbuf, sizeof(pbuf), 0);
+			if (!strcmp(lbuf, "user") && !strcmp(pbuf, "user"))
+			{
+				//strcpy(buf1, "¬ход выполнен успешно!");
+				strcpy(boolbuf, "t");
+				//send(s2, buf1, sizeof(buf1), 0);
+				send(s2, boolbuf, sizeof(boolbuf), 0);
+			}
+			else
+			{
+				//strcpy(buf1, "ќтказано в доступе");
+				strcpy(boolbuf, "f");
+				//send(s2, buf1, sizeof(buf1), 0);
+				send(s2, boolbuf, sizeof(boolbuf), 0);
+			}
+		}
+		else if (!strcmp(buf, "2")) {
+			recv(s2, lbuf, sizeof(lbuf), 0);
+			recv(s2, pbuf, sizeof(pbuf), 0);
+			if (!strcmp(lbuf, "admin") && !strcmp(pbuf, "admin"))
+			{
+				strcpy(buf1, "¬ход выполнен успешно!");
+				send(s2, buf1, sizeof(buf1), 0);
+			}
+			else
+			{
+				strcpy(buf1, "ќтказано в доступе");
+				send(s2, buf1, sizeof(buf1), 0);
+			}
+		}
+		else if (!strcmp(buf, "11")) {
+			strcpy(buf1, "измен€й");
+			send(s2, buf1, sizeof(buf1), 0);
+		}
+		else if (!strcmp(buf, "12")) {
+			strcpy(buf1, "измен€й");
+			send(s2, buf1, sizeof(buf1), 0);
+		}
+		else if (!strcmp(buf, "13")) {
+			strcpy(buf1, "удал€й");
+			send(s2, buf1, sizeof(buf1), 0);
+		}
+		else if (!strcmp(buf, "141")) {
+			strcpy(buf1, "филтруй");
+			send(s2, buf1, sizeof(buf1), 0);
+		}
+		else if (!strcmp(buf, "142")) {
+			strcpy(buf1, "фильтруй");
+			send(s2, buf1, sizeof(buf1), 0);
+		}
+		else if (!strcmp(buf, "151")) {
+			strcpy(buf1, "сортируй");
+			send(s2, buf1, sizeof(buf1), 0);
+		}
+		else if (!strcmp(buf, "152")) {
+			strcpy(buf1, "сортируй");
 			send(s2, buf1, sizeof(buf1), 0);
 		}
 	}
 	
 	closesocket(s2);
+	cout << "client " << num << " disconnected\n";
 	return 0;
 }
-
-int numcl = 0;
 
 void print()
 {

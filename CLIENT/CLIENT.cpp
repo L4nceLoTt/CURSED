@@ -15,11 +15,89 @@
 
 using namespace std;
 
+void SendRequest(SOCKET soc, string id){
+	char buf[100];
+	strcpy(buf, id.c_str());
+	send(soc, buf, sizeof(buf), 0);
+	*buf = '\0';
+	if (recv(soc, buf, sizeof(buf), 0) != 0)
+	{
+		system("cls");
+		cout << buf;
+		_getch();
+	}
+}
+
+char UserAuth(SOCKET soc, string id)
+{
+	char buf[100];
+	char lbuf[100];
+	char pbuf[100];
+	char boolbuf;
+
+	strcpy(buf, id.c_str());
+	
+	system("cls");
+	cout << "Логин: ";
+	cin >> lbuf;
+	cout << "Пароль: ";
+	cin >> pbuf;
+
+	send(soc, buf, sizeof(lbuf), 0);
+	send(soc, lbuf, sizeof(lbuf), 0);
+	send(soc, pbuf, sizeof(lbuf), 0);
+
+	*buf = '\0';
+	*lbuf = '\0';
+	*pbuf = '\0';
+	if (recv(soc, buf, sizeof(buf), 0) != 0)
+	{
+		boolbuf = buf[0];
+		//recv(soc, boolbuf, sizeof(boolbuf), 0);
+		system("cls");
+		cout << buf;
+		_getch();
+	}
+	return boolbuf;
+}
+
+char AdminAuth(SOCKET soc, string id)
+{
+	char buf[100];
+	char lbuf[100];
+	char pbuf[100];
+	char boolbuf;
+
+	strcpy(buf, id.c_str());
+
+	system("cls");
+	cout << "Логин: ";
+	cin >> lbuf;
+	cout << "Пароль: ";
+	cin >> pbuf;
+
+	send(soc, buf, sizeof(lbuf), 0);
+	send(soc, lbuf, sizeof(lbuf), 0);
+	send(soc, pbuf, sizeof(lbuf), 0);
+
+	*buf = '\0';
+	*lbuf = '\0';
+	*pbuf = '\0';
+	if (recv(soc, buf, sizeof(buf), 0) != 0)
+	{
+		boolbuf = buf[0];
+		system("cls");
+		cout << buf;
+		_getch();
+	}
+	return boolbuf;
+}
 
 void main() {
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	int err;
+	char boolbuf;
 	wVersionRequested = MAKEWORD(2, 2);
 	err = WSAStartup(wVersionRequested, &wsaData);
 	if (err != 0) { return; }
@@ -33,27 +111,52 @@ void main() {
 	
 	Menu menu;
 
-	menu.CreateMenu(3, "Соси", "Залупу", "Ленина");
-	{
 
+	menu.CreateMenu(2, "Пользователь", "Админ");
+	{
+		//menu.sub[0].CreateMenu(5, "Просмотреть", "Изменить", "Удалить", "Отфильтровать", "Сортировать");
+		//{
+		//	menu.sub[0].sub[3].CreateMenu(2, "какой-то", "фильтр");
+		//	menu.sub[0].sub[4].CreateMenu(2, "ну", "сортировка");
+		//}
+		//menu.sub[0].CreateMenu(5, "Просмотреть", "Изменить", "Удалить", "Отфильтровать", "Сортировать");
+		//{
+		//	menu.sub[0].sub[3].CreateMenu(2, "какой-то", "фильтр");
+		//	menu.sub[0].sub[4].CreateMenu(2, "ну", "сортировка");
+		//}
 	}
+	
 
 	bool running = true;
 	while (running) {
 		menu.ShowMenu();
 		menu.Navigation(&running);
+		if (menu.currentID == "1") {
+			boolbuf = UserAuth(s, menu.currentID);
+		}
 		if (menu.currentID == "2") {
-			char buf[100];
-			strcpy(buf, menu.currentID.c_str());
-			send(s, buf, sizeof(buf), 0);
-			*buf = '\0';
-			cout << "ДОШЛО до СЮДА";
-			if (recv(s, buf, sizeof(buf), 0) != 0)
-			{
-				system("cls");
-				cout << buf;
-				_getch();
-			}
+			AdminAuth(s, menu.currentID);
+		}
+		if (menu.currentID == "11") {
+			SendRequest(s, menu.currentID);
+		}
+		if (menu.currentID == "12") {
+			SendRequest(s, menu.currentID);
+		}
+		if (menu.currentID == "13") {
+			SendRequest(s, menu.currentID);
+		}
+		if (menu.currentID == "141") {
+			SendRequest(s, menu.currentID);
+		}
+		if (menu.currentID == "142") {
+			SendRequest(s, menu.currentID);
+		}
+		if (menu.currentID == "151") {
+			SendRequest(s, menu.currentID);
+		}
+		if (menu.currentID == "152") {
+			SendRequest(s, menu.currentID);
 		}
 	}
 
