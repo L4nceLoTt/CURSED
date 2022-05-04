@@ -17,6 +17,7 @@ using namespace std;
 
 Menu RegMenu, UserMenu, AdminMenu;
 Menu* MenuPtr = &RegMenu;
+bool unreg = false;
 
 void SendRequest(SOCKET soc, string id) {
 	char buf[100];
@@ -75,6 +76,7 @@ void SendReg(SOCKET soc) {
 }
 void Unreg() {
 	user.setReg(false, false);
+	unreg = true;
 }
 
 
@@ -116,6 +118,10 @@ void main() {
 		if (!user.GetStatus() && !user.GetSmth() && MenuPtr->currentID == "1") {
 			SendRequest(s, "0_" + MenuPtr->currentID);
 			SendReg(s);
+		}
+		if (unreg == true) {
+			SendRequest(s, "0_0");
+			unreg = false;
 		}
 	}
 

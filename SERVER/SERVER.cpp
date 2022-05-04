@@ -15,10 +15,14 @@
 
 using namespace std;
 
+int numcl = 0;
+
 DWORD WINAPI ThreadFunc(LPVOID client_socket)
 {
+	int num = numcl;
 	SOCKET s2 = ((SOCKET*)client_socket)[0];
 	char buf[100];
+	string _log;
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
 		if (!strcmp(buf, "0_1")){
@@ -38,6 +42,8 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 
 					if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
 						send(s2, "11", sizeof("11"), 0);
+						_log = log;
+						cout << "client N-" << num << " authorised like " << "\"" << log << "\"\n" << "";
 						exist = true;
 						Afile.close();
 						break;
@@ -51,6 +57,8 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 
 						if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
 							send(s2, "21", sizeof("21"), 0);
+							_log = log;
+							cout << "client N-" << num << " authorised like " << "\"" << log << "\"\n" << "";
 							exist = true;
 							Ufile.close();
 							break;
@@ -60,23 +68,23 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 
 				if (exist == false) {
 					send(s2, "00", sizeof("00"), 0);
+					cout << "client N-" << num << " failed his authorisation\n";
 					exist = true;
 				}
 			}
 		}
+		else if (!strcmp(buf, "0_0")) cout << "client N-" << numcl << " unauthorised\n";
 		
 	}
 	
 	closesocket(s2);
-	cout << "client " << num << " disconnected\n";
+	cout << "client N-" << num << " disconnected\n";
 	return 0;
 }
 
-int numcl = 0;
-
 void print()
 {
-	if (numcl) printf("%d client connected\n", numcl);
+	if (numcl) cout << "client N-" << numcl << " connected\n";
 	else printf("No clients connected\n");
 }
 
