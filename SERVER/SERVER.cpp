@@ -9,6 +9,7 @@
 #include <string.h>
 #include <Windows.h>
 #include <iostream>
+#include <fstream>
 
 #pragma warning(disable : 4996)
 
@@ -21,12 +22,47 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
 		if (!strcmp(buf, "0_1")){
-			bool exist = false, isAdmin = false;
+			bool exist = false;
 			char lbuf[100], pbuf[100];
 			recv(s2, lbuf, 100, 0);
 			recv(s2, pbuf, 100, 0);
 
-			ifstream Afile("admin.txt", ios::in);
+			ifstream Afile; Afile.open("admin.txt", ios::in);
+			ifstream Ufile; Ufile.open("user.txt", ios::in);
+
+			while (!exist) {
+				string log, pass;
+				while (Afile) {
+					Afile >> log;
+					Afile >> pass;
+
+					if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
+						send(s2, "11", sizeof("11"), 0);
+						exist = true;
+						Afile.close();
+						break;
+					}
+				}
+
+				if (exist == false) {
+					while (Ufile) {
+						Ufile >> log;
+						Ufile >> pass;
+
+						if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
+							send(s2, "21", sizeof("21"), 0);
+							exist = true;
+							Ufile.close();
+							break;
+						}
+					}
+				}
+
+				if (exist == false) {
+					send(s2, "00", sizeof("00"), 0);
+					exist = true;
+				}
+			}
 		}
 		
 	}
