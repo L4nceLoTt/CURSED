@@ -68,6 +68,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	}
 	
 	closesocket(s2);
+	cout << "client " << num << " disconnected\n";
 	return 0;
 }
 
