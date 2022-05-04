@@ -16,6 +16,8 @@
 using namespace std;
 
 int numcl = 0;
+ifstream Afile;
+ifstream Ufile;
 
 DWORD WINAPI ThreadFunc(LPVOID client_socket)
 {
@@ -31,11 +33,9 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 			recv(s2, lbuf, 100, 0);
 			recv(s2, pbuf, 100, 0);
 
-			ifstream Afile; Afile.open("admin.txt", ios::in);
-			ifstream Ufile; Ufile.open("user.txt", ios::in);
-
 			while (!exist) {
 				string log, pass;
+				Afile.open("admin.txt", ios::in);
 				while (Afile) {
 					Afile >> log;
 					Afile >> pass;
@@ -49,8 +49,10 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 						break;
 					}
 				}
+				Afile.close();
 
 				if (exist == false) {
+					Ufile.open("user.txt", ios::in);
 					while (Ufile) {
 						Ufile >> log;
 						Ufile >> pass;
@@ -64,6 +66,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 							break;
 						}
 					}
+					Ufile.close();
 				}
 
 				if (exist == false) {
