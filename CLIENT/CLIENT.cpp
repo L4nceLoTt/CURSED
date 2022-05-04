@@ -117,7 +117,6 @@ void main() {
 		if (!user.GetStatus() && !user.GetSmth() && MenuPtr->currentID == "1") {
 			SendRequest(s, "0_" + MenuPtr->currentID);
 			SendReg(s);
-			MenuPtr->currentID = "0";
 		}
 	}
 
