@@ -88,7 +88,6 @@ void main() {
 	err = WSAStartup(wVersionRequested, &wsaData);
 	if (err != 0) { return; }
 	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
-	// указание адреса и порта сервера
 	sockaddr_in dest_addr;
 	dest_addr.sin_family = AF_INET;
 	dest_addr.sin_port = htons(1280);
