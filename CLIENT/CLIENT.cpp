@@ -73,7 +73,6 @@ void SendReg(SOCKET soc) {
 		_getch();
 	}
 }
-
 void Unreg() {
 	user.setReg(false, false);
 }
