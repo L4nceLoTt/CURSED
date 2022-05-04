@@ -18,6 +18,41 @@ using namespace std;
 Menu RegMenu, UserMenu, AdminMenu;
 Menu* MenuPtr = &RegMenu;
 
+void SendRequest(SOCKET soc, string id) {
+	char buf[100];
+	strcpy(buf, id.c_str());
+	send(soc, buf, sizeof(buf), 0);
+}
+
+void SendReg(SOCKET soc) {
+	string log, pass;
+
+	cout << "Введите логин: ";
+	cin >> log;
+	cout << "Введите пароль: ";
+	cin >> pass;
+
+	char lbuf[100];
+	char pbuf[100];
+	char tfbuf[100];
+
+	strcpy(lbuf, log.c_str());
+	strcpy(pbuf, pass.c_str());
+
+	send(soc, lbuf, sizeof(lbuf), 0);
+	send(soc, pbuf, sizeof(pbuf), 0);
+	
+	recv(soc, tfbuf, sizeof(tfbuf), 0);
+
+	if (!strcmp(tfbuf, "11")) user.setReg(true, true);
+	else if (!strcmp(tfbuf, "21")) user.setReg(false, true);
+	else {
+		system("cls");
+		cout << "Ошибка авторизации";
+		_getch();
+	}
+}
+
 class User {
 	bool isAdmin = false;
 	bool isSmth = false;
@@ -67,17 +102,8 @@ void main() {
 	connect(s, (sockaddr*)&dest_addr, sizeof(dest_addr));
 
 	RegMenu.CreateMenu(1, "Войти"); 
-	{
-		RegMenu.function[0] = Registr;
-	}
 	UserMenu.CreateMenu(2, "Пользователь", "Выйти");
-	{
-		UserMenu.function[1] = Unreg;
-	}
 	AdminMenu.CreateMenu(2, "Админ", "Выйти");
-	{
-		AdminMenu.function[1] = Unreg;
-	}
 	
 
 	bool running = true;
@@ -88,6 +114,11 @@ void main() {
 
 		MenuPtr->ShowMenu();
 		MenuPtr->Navigation(&running);
+
+		if (!user.GetStatus() && !user.GetSmth() && MenuPtr->currentID == "1") {
+			SendRequest(s, "0_" + MenuPtr->currentID);
+			SendReg(soc);
+		}
 	}
 
 	closesocket(s);

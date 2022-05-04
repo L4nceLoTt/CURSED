@@ -8,6 +8,7 @@
 #include <string>
 #include <string.h>
 #include <Windows.h>
+#include <iostream>
 
 #pragma warning(disable : 4996)
 
@@ -17,14 +18,17 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 {
 	SOCKET s2 = ((SOCKET*)client_socket)[0];
 	char buf[100];
-	char buf1[100];
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
-		
-		if (!strcmp(buf, "2")) {
-			strcpy(buf1, "янях уси");
-			send(s2, buf1, sizeof(buf1), 0);
+		if (!strcmp(buf, "0_1")){
+			bool exist = false, isAdmin = false;
+			char lbuf[100], pbuf[100];
+			recv(s2, lbuf, 100, 0);
+			recv(s2, pbuf, 100, 0);
+
+			ifstream Afile("admin.txt", ios::in);
 		}
+		
 	}
 	
 	closesocket(s2);
