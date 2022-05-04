@@ -96,11 +96,11 @@ void main() {
 	connect(s, (sockaddr*)&dest_addr, sizeof(dest_addr));
 
 	RegMenu.CreateMenu(1, "Войти"); 
-	UserMenu.CreateMenu(2, "Пользователь", "Выйти");
+	UserMenu.CreateMenu(2, "Пользователь", "Выйти из уч.з.");
 	{
 		UserMenu.function[1] = Unreg;
 	}
-	AdminMenu.CreateMenu(2, "Админ", "Выйти");
+	AdminMenu.CreateMenu(2, "Админ", "Выйти из уч.з.");
 	{
 		AdminMenu.function[1] = Unreg;
 	}
