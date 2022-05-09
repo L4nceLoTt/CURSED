@@ -109,9 +109,8 @@ void main() {
 	int c = listen(s, 5);
 	cout << "Server receive ready" << endl;
 	cout << endl;
-	// извлекаем сообщение из очереди
-	SOCKET client_socket;    // сокет для клиента
-	sockaddr_in client_addr; // адрес клиента (заполняется системой)
+	SOCKET client_socket;
+	sockaddr_in client_addr;
 	int client_addr_size = sizeof(client_addr);
 	// цикл извлечения запросов на подключение из очереди
 	while ((client_socket = accept(s, (sockaddr*)&client_addr, &client_addr_size))) {
