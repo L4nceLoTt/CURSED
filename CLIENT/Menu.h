@@ -32,6 +32,10 @@ public:
 		return "\0";
 	}
 
+	void SetHeader(string head) {
+		header = head;
+	}
+
 	void CreateMenu(int num, const char* name, ...) {
 		if (main->parent == NULL) main->header = "Главное меню";
 

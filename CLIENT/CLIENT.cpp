@@ -19,12 +19,6 @@ Menu RegMenu, UserMenu, AdminMenu;
 Menu* MenuPtr = &RegMenu;
 bool unreg = false;
 
-void SendRequest(SOCKET soc, string id) {
-	char buf[100];
-	strcpy(buf, id.c_str());
-	send(soc, buf, sizeof(buf), 0);
-}
-
 class User {
 	bool isAdmin = false;
 	bool isSmth = false;
@@ -43,6 +37,12 @@ public:
 };
 
 User user;
+
+void SendRequest(SOCKET soc, string id) {
+	char buf[100];
+	strcpy(buf, id.c_str());
+	send(soc, buf, sizeof(buf), 0);
+}
 
 void SendReg(SOCKET soc) {
 	string log, pass;
@@ -79,6 +79,72 @@ void Unreg() {
 	unreg = true;
 }
 
+void SendAdd(SOCKET soc) {
+	Menu menu;
+	char buf[100];
+	menu.SetHeader("Группа товара");
+
+	menu.CreateMenu(3, "Бакалея", "Консервация", "Масла,уксусы")
+
+	bool running = true;
+	while (running) {
+		menu.ShowMenu();
+		menu.Navigation(&running);
+		system("cls");
+		if (menu.currentID == "1") {
+			send(soc, "Бакалея", sizeof("Бакалея"), 0);
+			cout << "Введите код товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите название товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите стоимость товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите поставщика товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+
+			running = false;
+		}
+		else if (menu.currentID == "2") {
+			send(soc, "Консервация", sizeof("Консервация"), 0);
+			cout << "Введите код товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите название товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите стоимость товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите поставщика товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+
+			running = false;
+		}
+		else if (menu.currentID == "3") {
+			send(soc, "Масла,уксусы", sizeof("Масла,уксусы"), 0);
+			cout << "Введите код товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите название товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите стоимость товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите поставщика товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+
+			running = false;
+		}
+	}
+}
+
 
 void main() {
 	WORD wVersionRequested;
@@ -99,7 +165,7 @@ void main() {
 	{
 		UserMenu.function[1] = Unreg;
 	}
-	AdminMenu.CreateMenu(2, "Админ", "Выйти из уч.з.");
+	AdminMenu.CreateMenu(2, "Добавить товар", "Выйти из уч.з.");
 	{
 		AdminMenu.function[1] = Unreg;
 	}
@@ -114,9 +180,17 @@ void main() {
 		MenuPtr->ShowMenu();
 		MenuPtr->Navigation(&running);
 
-		if (!user.GetStatus() && !user.GetSmth() && MenuPtr->currentID == "1") {
-			SendRequest(s, "0_" + MenuPtr->currentID);
-			SendReg(s);
+		if (!user.GetStatus() && !user.GetSmth()) {
+			if (MenuPtr->currentID == "1") {
+				SendRequest(s, "0_" + MenuPtr->currentID);
+				SendReg(s);
+			}
+		}
+		else if (user.GetStatus() && user.GetSmth()) {
+			if (MenuPtr->currentID == "1") {
+				SendRequest(s, "1_" + MenuPtr->currentID);
+
+			}
 		}
 		if (unreg == true) {
 			SendRequest(s, "0_0");

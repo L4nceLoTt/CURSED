@@ -10,6 +10,8 @@
 #include <Windows.h>
 #include <iostream>
 #include <fstream>
+#include "Classes.h"
+#include "Libs.h"
 
 #pragma warning(disable : 4996)
 
@@ -19,69 +21,148 @@ int numcl = 0;
 ifstream Afile;
 ifstream Ufile;
 
+vector<Product> bak, kons, masl;
+
+void Init() {
+	vector<Product>::iterator ptr = bak.begin();
+	ifstream Bak, Kons, Masl;
+
+	Bak.open("Бакалея.txt", ios::in);
+	for (; ptr != bak.end; ptr++) {
+		Bak << *ptr;
+	}
+	Bak.close();
+
+	vector<Product>::iterator ptr = kons.begin();
+	Kons.open("Бакалея.txt", ios::in);
+	for (; ptr != kons.end; ptr++) {
+		Kons << *ptr;
+	}
+	Kons.close();
+
+	vector<Product>::iterator ptr = masl.begin();
+	Masl.open("Бакалея.txt", ios::in);
+	for (; ptr != masl.end; ptr++) {
+		Masl << *ptr;
+	}
+	Masl.close();
+}
+void Save() {
+	vector<Product>::iterator ptr = bak.begin();
+	ofstream Bak, Kons, Masl;
+
+	Bak.open("Бакалея.txt", ios::out);
+	for (; ptr != bak.end; ptr++) {
+		Bak >> *ptr;
+	}
+	Bak.close();
+
+	vector<Product>::iterator ptr = kons.begin();
+	Kons.open("Бакалея.txt", ios::in);
+	for (; ptr != kons.end; ptr++) {
+		Kons >> *ptr;
+	}
+	Kons.close();
+
+	vector<Product>::iterator ptr = masl.begin();
+	Masl.open("Бакалея.txt", ios::in);
+	for (; ptr != masl.end; ptr++) {
+		Masl >> *ptr;
+	}
+	Masl.close();
+}
+
 DWORD WINAPI ThreadFunc(LPVOID client_socket)
 {
+	Init();
+
 	int num = numcl;
 	SOCKET s2 = ((SOCKET*)client_socket)[0];
 	char buf[100];
 	string _log;
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
-		if (!strcmp(buf, "0_1")){
-			bool exist = false;
-			char lbuf[100], pbuf[100];
-			recv(s2, lbuf, 100, 0);
-			recv(s2, pbuf, 100, 0);
+		*buf = '\0';
+		if (!strcmp(buf[0], '0')) {
+			if (!strcmp(buf, "0_1")) {
+				bool exist = false;
+				char lbuf[100], pbuf[100];
+				recv(s2, lbuf, 100, 0);
+				recv(s2, pbuf, 100, 0);
 
-			while (!exist) {
-				string log, pass;
-				Afile.open("admin.txt", ios::in);
-				while (Afile) {
-					Afile >> log;
-					Afile >> pass;
-
-					if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
-						send(s2, "11", sizeof("11"), 0);
-						_log = log;
-						cout << "client N-" << num << " authorised like " << "\"" << log << "\"\n" << "";
-						exist = true;
-						Afile.close();
-						break;
-					}
-				}
-				Afile.close();
-
-				if (exist == false) {
-					Ufile.open("user.txt", ios::in);
-					while (Ufile) {
-						Ufile >> log;
-						Ufile >> pass;
+				while (!exist) {
+					string log, pass;
+					Afile.open("admin.txt", ios::in);
+					while (Afile) {
+						Afile >> log;
+						Afile >> pass;
 
 						if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
-							send(s2, "21", sizeof("21"), 0);
+							send(s2, "11", sizeof("11"), 0);
 							_log = log;
 							cout << "client N-" << num << " authorised like " << "\"" << log << "\"\n" << "";
 							exist = true;
-							Ufile.close();
+							Afile.close();
 							break;
 						}
 					}
-					Ufile.close();
-				}
+					Afile.close();
 
-				if (exist == false) {
-					send(s2, "00", sizeof("00"), 0);
-					cout << "client N-" << num << " failed his authorisation\n";
-					exist = true;
+					if (exist == false) {
+						Ufile.open("user.txt", ios::in);
+						while (Ufile) {
+							Ufile >> log;
+							Ufile >> pass;
+
+							if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
+								send(s2, "21", sizeof("21"), 0);
+								_log = log;
+								cout << "client N-" << num << " authorised like " << "\"" << log << "\"\n" << "";
+								exist = true;
+								Ufile.close();
+								break;
+							}
+						}
+						Ufile.close();
+					}
+
+					if (exist == false) {
+						send(s2, "00", sizeof("00"), 0);
+						cout << "client N-" << num << " failed his authorisation\n";
+						exist = true;
+					}
 				}
 			}
 		}
+		else if (!strcmp(buf[0], '1')) {
+			if (!strcmp(buf, "1_1")) {
+				string group, name, dealer;
+				int code;
+				float cost;
+				recv(s2, buf, 100, 0); group = buf; *buf = '\0';
+				recv(s2, buf, 100, 0); code = atoi(buf); *buf = '\0';
+				recv(s2, buf, 100, 0); name = buf; *buf = '\0';
+				recv(s2, buf, 100, 0); cost = stof(buf); *buf = '\0';
+				recv(s2, buf, 100, 0); dealer = buf; *buf = '\0';
+
+				Product prod(group, code, name, cost, dealer);
+
+				if (group == "Бакалея") bak.push_back(prod);
+				else if (group == "Консервация") kons.push_back(prod);
+				else if (group == "Масла,уксусы") masl.push_back(prod);
+			}
+		}
+		else if (!strcmp(buf[0], '2'))
+		
 		else if (!strcmp(buf, "0_0")) cout << "client N-" << numcl << " unauthorised\n";
 		
 	}
 	
 	closesocket(s2);
 	cout << "client N-" << num << " disconnected\n";
+
+	Save();
+
 	return 0;
 }
 
@@ -90,7 +171,6 @@ void print()
 	if (numcl) cout << "client N-" << numcl << " connected\n";
 	else printf("No clients connected\n");
 }
-
 
 void main() {
 	WORD wVersionRequested;
@@ -112,12 +192,10 @@ void main() {
 	SOCKET client_socket;
 	sockaddr_in client_addr;
 	int client_addr_size = sizeof(client_addr);
-	// цикл извлечения запросов на подключение из очереди
 	while ((client_socket = accept(s, (sockaddr*)&client_addr, &client_addr_size))) {
 		numcl++;
 		print();
-		// Вызов нового потока для обслуживания клиента
-		DWORD thID;// thID идентификатор типа DWORD
+		DWORD thID;
 		CreateThread(NULL, NULL, ThreadFunc, &client_socket, NULL, &thID);
 	}
 }
