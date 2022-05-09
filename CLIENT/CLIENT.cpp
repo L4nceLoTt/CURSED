@@ -84,14 +84,15 @@ void SendAdd(SOCKET soc) {
 	char buf[100];
 	menu.SetHeader("Группа товара");
 
-	menu.CreateMenu(3, "Бакалея", "Консервация", "Масла,уксусы")
+	menu.CreateMenu(3, "Бакалея", "Консервация", "Масла,уксусы");
 
 	bool running = true;
 	while (running) {
 		menu.ShowMenu();
 		menu.Navigation(&running);
-		system("cls");
+
 		if (menu.currentID == "1") {
+			system("cls");
 			send(soc, "Бакалея", sizeof("Бакалея"), 0);
 			cout << "Введите код товара: ";
 			cin >> buf;
@@ -109,6 +110,7 @@ void SendAdd(SOCKET soc) {
 			running = false;
 		}
 		else if (menu.currentID == "2") {
+			system("cls");
 			send(soc, "Консервация", sizeof("Консервация"), 0);
 			cout << "Введите код товара: ";
 			cin >> buf;
@@ -126,6 +128,7 @@ void SendAdd(SOCKET soc) {
 			running = false;
 		}
 		else if (menu.currentID == "3") {
+			system("cls");
 			send(soc, "Масла,уксусы", sizeof("Масла,уксусы"), 0);
 			cout << "Введите код товара: ";
 			cin >> buf;
@@ -189,7 +192,7 @@ void main() {
 		else if (user.GetStatus() && user.GetSmth()) {
 			if (MenuPtr->currentID == "1") {
 				SendRequest(s, "1_" + MenuPtr->currentID);
-
+				SendAdd(s);
 			}
 		}
 		if (unreg == true) {

@@ -28,22 +28,22 @@ void Init() {
 	ifstream Bak, Kons, Masl;
 
 	Bak.open("Бакалея.txt", ios::in);
-	for (; ptr != bak.end; ptr++) {
-		Bak << *ptr;
+	for (; ptr != bak.end(); ptr++) {
+		Bak >> *ptr;
 	}
 	Bak.close();
 
-	vector<Product>::iterator ptr = kons.begin();
+	ptr = kons.begin();
 	Kons.open("Бакалея.txt", ios::in);
-	for (; ptr != kons.end; ptr++) {
-		Kons << *ptr;
+	for (; ptr != kons.end(); ptr++) {
+		Kons >> *ptr;
 	}
 	Kons.close();
 
-	vector<Product>::iterator ptr = masl.begin();
+	ptr = masl.begin();
 	Masl.open("Бакалея.txt", ios::in);
-	for (; ptr != masl.end; ptr++) {
-		Masl << *ptr;
+	for (; ptr != masl.end(); ptr++) {
+		Masl >> *ptr;
 	}
 	Masl.close();
 }
@@ -52,22 +52,22 @@ void Save() {
 	ofstream Bak, Kons, Masl;
 
 	Bak.open("Бакалея.txt", ios::out);
-	for (; ptr != bak.end; ptr++) {
-		Bak >> *ptr;
+	for (; ptr != bak.end(); ptr++) {
+		Bak << *ptr;
 	}
 	Bak.close();
 
-	vector<Product>::iterator ptr = kons.begin();
+	ptr = kons.begin();
 	Kons.open("Бакалея.txt", ios::in);
-	for (; ptr != kons.end; ptr++) {
-		Kons >> *ptr;
+	for (; ptr != kons.end(); ptr++) {
+		Kons << *ptr;
 	}
 	Kons.close();
 
-	vector<Product>::iterator ptr = masl.begin();
+	ptr = masl.begin();
 	Masl.open("Бакалея.txt", ios::in);
-	for (; ptr != masl.end; ptr++) {
-		Masl >> *ptr;
+	for (; ptr != masl.end(); ptr++) {
+		Masl << *ptr;
 	}
 	Masl.close();
 }
@@ -82,8 +82,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	string _log;
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
-		*buf = '\0';
-		if (!strcmp(buf[0], '0')) {
+		if (buf[0] == '0') {
 			if (!strcmp(buf, "0_1")) {
 				bool exist = false;
 				char lbuf[100], pbuf[100];
@@ -134,8 +133,9 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				}
 			}
 		}
-		else if (!strcmp(buf[0], '1')) {
+		else if (buf[0] == '1') {
 			if (!strcmp(buf, "1_1")) {
+				*buf = '\0';
 				string group, name, dealer;
 				int code;
 				float cost;
@@ -152,7 +152,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				else if (group == "Масла,уксусы") masl.push_back(prod);
 			}
 		}
-		else if (!strcmp(buf[0], '2'))
+		else if (buf[0] == '2'){}
 		
 		else if (!strcmp(buf, "0_0")) cout << "client N-" << numcl << " unauthorised\n";
 		
