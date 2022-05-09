@@ -26,25 +26,32 @@ vector<Product> bak, kons, masl;
 void Init() {
 	vector<Product>::iterator ptr = bak.begin();
 	ifstream Bak, Kons, Masl;
+	Product tmp;
 
 	Bak.open("Бакалея.txt", ios::in);
-	for (; ptr != bak.end(); ptr++) {
-		Bak >> *ptr;
+	while (Bak) {
+		Bak >> tmp;
+		bak.push_back(tmp);
 	}
+	bak.erase(bak.end() - 1);
 	Bak.close();
 
 	ptr = kons.begin();
 	Kons.open("Бакалея.txt", ios::in);
-	for (; ptr != kons.end(); ptr++) {
-		Kons >> *ptr;
+	while (Kons) {
+		Kons >> tmp;
+		kons.push_back(tmp);
 	}
+	kons.erase(kons.end() - 1);
 	Kons.close();
 
 	ptr = masl.begin();
 	Masl.open("Бакалея.txt", ios::in);
-	for (; ptr != masl.end(); ptr++) {
-		Masl >> *ptr;
+	while (Masl) {
+		Masl >> tmp;
+		masl.push_back(tmp);
 	}
+	masl.erase(masl.end() - 1);
 	Masl.close();
 }
 void Save() {
@@ -78,7 +85,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 
 	int num = numcl;
 	SOCKET s2 = ((SOCKET*)client_socket)[0];
-	char buf[100];
+	char buf[50];
 	string _log;
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
@@ -86,6 +93,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 			if (!strcmp(buf, "0_1")) {
 				bool exist = false;
 				char lbuf[100], pbuf[100];
+				recv(s2, lbuf, 100, 0);
 				recv(s2, lbuf, 100, 0);
 				recv(s2, pbuf, 100, 0);
 
@@ -137,13 +145,15 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 			if (!strcmp(buf, "1_1")) {
 				*buf = '\0';
 				string group, name, dealer;
-				int code;
-				float cost;
+				string code;
+				string cost;
 				recv(s2, buf, 100, 0); group = buf; *buf = '\0';
-				recv(s2, buf, 100, 0); code = atoi(buf); *buf = '\0';
+				recv(s2, buf, 100, 0); group = buf; *buf = '\0';
+				recv(s2, buf, 100, 0); code = buf; *buf = '\0';
 				recv(s2, buf, 100, 0); name = buf; *buf = '\0';
-				recv(s2, buf, 100, 0); cost = stof(buf); *buf = '\0';
+				recv(s2, buf, 100, 0); cost = buf; *buf = '\0';
 				recv(s2, buf, 100, 0); dealer = buf; *buf = '\0';
+
 
 				Product prod(group, code, name, cost, dealer);
 
@@ -151,11 +161,23 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				else if (group == "Консервация") kons.push_back(prod);
 				else if (group == "Масла,уксусы") masl.push_back(prod);
 			}
+			else if (!strcmp(buf, "1_2")) {
+				vector<Product>::iterator ptr = bak.begin();
+
+				for (; ptr != bak.end(); ptr++) {
+					char group[100], name[100], cost[100];
+					ptr->getFields(group, name, cost);
+					send(s2, group, sizeof(group), 0);
+					send(s2, name, sizeof(name), 0);
+					send(s2, cost, sizeof(cost), 0);
+				}
+				send(s2, "0", sizeof("0"), 0);
+			}
 		}
 		else if (buf[0] == '2'){}
 		
 		else if (!strcmp(buf, "0_0")) cout << "client N-" << numcl << " unauthorised\n";
-		
+		*buf = '\0';
 	}
 	
 	closesocket(s2);

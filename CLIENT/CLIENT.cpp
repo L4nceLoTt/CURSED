@@ -19,6 +19,12 @@ Menu RegMenu, UserMenu, AdminMenu;
 Menu* MenuPtr = &RegMenu;
 bool unreg = false;
 
+void Replace(char* buf, char replace, char to) {
+	for (int i = 0; i < 60; i++) {
+		if (buf[i] == replace) buf[i] = to;
+	}
+}
+
 class User {
 	bool isAdmin = false;
 	bool isSmth = false;
@@ -147,7 +153,25 @@ void SendAdd(SOCKET soc) {
 		}
 	}
 }
-
+void SendShow(SOCKET soc) {
+	system("cls");
+	cout << "+---------------+--------------------------------------------------+-----+\n";
+	cout << "|     Группа    |                     Название                     | Цена|\n";
+	cout << "+---------------+--------------------------------------------------+-----+\n";
+	char group[100], name[100], cost[100];
+	while (true) {
+		recv(soc, group, sizeof(group), 0);
+		if (strcmp(group, "0")) {
+			recv(soc, name, sizeof(name), 0);
+			Replace(name, '_', ' ');
+			recv(soc, cost, sizeof(cost), 0);
+			printf("|%15s|%50s|%5s|\n", group, name, cost);
+			cout << "+---------------+--------------------------------------------------+-----+\n";
+		}
+		else break;
+	}
+	_getch();
+}
 
 void main() {
 	WORD wVersionRequested;
@@ -168,9 +192,9 @@ void main() {
 	{
 		UserMenu.function[1] = Unreg;
 	}
-	AdminMenu.CreateMenu(2, "Добавить товар", "Выйти из уч.з.");
+	AdminMenu.CreateMenu(3, "Добавить товар", "Показать товары", "Выйти из уч.з.");
 	{
-		AdminMenu.function[1] = Unreg;
+		AdminMenu.function[2] = Unreg;
 	}
 	
 
@@ -180,6 +204,7 @@ void main() {
 		else if (!user.GetStatus() && !user.GetSmth()) MenuPtr = &RegMenu;
 		else if (user.GetStatus() && user.GetSmth()) MenuPtr = &AdminMenu;
 
+		MenuPtr->currentID = "0";
 		MenuPtr->ShowMenu();
 		MenuPtr->Navigation(&running);
 
@@ -193,6 +218,10 @@ void main() {
 			if (MenuPtr->currentID == "1") {
 				SendRequest(s, "1_" + MenuPtr->currentID);
 				SendAdd(s);
+			}
+			else if (MenuPtr->currentID == "2") {
+				SendRequest(s, "1_" + MenuPtr->currentID);
+				SendShow(s);
 			}
 		}
 		if (unreg == true) {
