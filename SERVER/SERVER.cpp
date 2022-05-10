@@ -37,7 +37,7 @@ void Init() {
 	Bak.close();
 
 	ptr = kons.begin();
-	Kons.open("Бакалея.txt", ios::in);
+	Kons.open("Консервация.txt", ios::in);
 	while (Kons) {
 		Kons >> tmp;
 		kons.push_back(tmp);
@@ -46,7 +46,7 @@ void Init() {
 	Kons.close();
 
 	ptr = masl.begin();
-	Masl.open("Бакалея.txt", ios::in);
+	Masl.open("Маслауксусы.txt", ios::in);
 	while (Masl) {
 		Masl >> tmp;
 		masl.push_back(tmp);
@@ -65,14 +65,14 @@ void Save() {
 	Bak.close();
 
 	ptr = kons.begin();
-	Kons.open("Бакалея.txt", ios::in);
+	Kons.open("Консервация.txt", ios::out);
 	for (; ptr != kons.end(); ptr++) {
 		Kons << *ptr;
 	}
 	Kons.close();
 
 	ptr = masl.begin();
-	Masl.open("Бакалея.txt", ios::in);
+	Masl.open("Маслауксусы.txt", ios::out);
 	for (; ptr != masl.end(); ptr++) {
 		Masl << *ptr;
 	}
@@ -171,6 +171,26 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 					send(s2, name, sizeof(name), 0);
 					send(s2, cost, sizeof(cost), 0);
 				}
+
+				ptr = kons.begin();
+
+				for (; ptr != kons.end(); ptr++) {
+					char group[100], name[100], cost[100];
+					ptr->getFields(group, name, cost);
+					send(s2, group, sizeof(group), 0);
+					send(s2, name, sizeof(name), 0);
+					send(s2, cost, sizeof(cost), 0);
+				}
+
+				ptr = masl.begin();
+
+				for (; ptr != masl.end(); ptr++) {
+					char group[100], name[100], cost[100];
+					ptr->getFields(group, name, cost);
+					send(s2, group, sizeof(group), 0);
+					send(s2, name, sizeof(name), 0);
+					send(s2, cost, sizeof(cost), 0);
+				}
 				send(s2, "0", sizeof("0"), 0);
 			}
 		}
@@ -180,10 +200,10 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 		*buf = '\0';
 	}
 	
+	Save();
+
 	closesocket(s2);
 	cout << "client N-" << num << " disconnected\n";
-
-	Save();
 
 	return 0;
 }
