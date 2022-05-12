@@ -153,7 +153,29 @@ void SendAdd(SOCKET soc) {
 		}
 	}
 }
-void SendShow(SOCKET soc) {
+
+void AdminSendShow(SOCKET soc) {
+	system("cls");
+	cout << "+--------+---------------+--------------------------------------------------+-----+---------------+\n";
+	cout << "|   Код  |     Группа    |                     Название                     | Цена|    Постащик   |\n";
+	cout << "+--------+---------------+--------------------------------------------------+-----+---------------+\n";
+	char group[100], name[100], cost[100], code[100], dealer[100];
+	while (true) {
+		recv(soc, group, sizeof(group), 0);
+		if (strcmp(group, "0")) {
+			recv(soc, name, sizeof(name), 0);
+			Replace(name, '_', ' ');
+			recv(soc, cost, sizeof(cost), 0);
+			recv(soc, code, sizeof(code), 0);
+			recv(soc, dealer, sizeof(dealer), 0);
+			printf("|%8s|%15s|%50s|%5s|%15s|\n", code, group, name, cost, dealer);
+			cout << "+--------+---------------+--------------------------------------------------+-----+---------------+\n";
+		}
+		else break;
+	}
+	_getch();
+}
+void UserSendShow(SOCKET soc) {
 	system("cls");
 	cout << "+---------------+--------------------------------------------------+-----+\n";
 	cout << "|     Группа    |                     Название                     | Цена|\n";
@@ -173,6 +195,37 @@ void SendShow(SOCKET soc) {
 	_getch();
 }
 
+void SendSearch(SOCKET soc) {
+	system("cls");
+	bool exist = false;
+	char str[100];
+	cout << "Поиск: ";
+	cin >> str;
+	send(soc, str, sizeof(str), 0);
+	system("cls");
+	cout << "+---------------+--------------------------------------------------+-----+\n";
+	cout << "|     Группа    |                     Название                     | Цена|\n";
+	cout << "+---------------+--------------------------------------------------+-----+\n";
+	char group[100], name[100], cost[100];
+	while (true) {
+		recv(soc, group, sizeof(group), 0);
+		if (strcmp(group, "0")) {
+			exist = true;
+			recv(soc, name, sizeof(name), 0);
+			Replace(name, '_', ' ');
+			recv(soc, cost, sizeof(cost), 0);
+			printf("|%15s|%50s|%5s|\n", group, name, cost);
+			cout << "+---------------+--------------------------------------------------+-----+\n";
+		}
+		else break;
+	}
+	if (exist == false) {
+		printf("|                         Совпадений не найдено                          |\n");
+		printf("+------------------------------------------------------------------------+\n");
+	}
+	_getch();
+}
+
 void main() {
 	WORD wVersionRequested;
 	WSADATA wsaData;
@@ -188,9 +241,9 @@ void main() {
 	connect(s, (sockaddr*)&dest_addr, sizeof(dest_addr));
 
 	RegMenu.CreateMenu(1, "Войти"); 
-	UserMenu.CreateMenu(2, "Пользователь", "Выйти из уч.з.");
+	UserMenu.CreateMenu(3, "Показать товары", "Поиск", "Выйти из уч.з.");
 	{
-		UserMenu.function[1] = Unreg;
+		UserMenu.function[2] = Unreg;
 	}
 	AdminMenu.CreateMenu(3, "Добавить товар", "Показать товары", "Выйти из уч.з.");
 	{
@@ -208,20 +261,34 @@ void main() {
 		MenuPtr->ShowMenu();
 		MenuPtr->Navigation(&running);
 
-		if (!user.GetStatus() && !user.GetSmth()) {
+		if (!user.GetStatus() && !user.GetSmth()) {					//Unreg user or admin
 			if (MenuPtr->currentID == "1") {
 				SendRequest(s, "0_" + MenuPtr->currentID);
 				SendReg(s);
 			}
+			if (MenuPtr->currentID == "2") {
+				SendRequest(s, "0_" + MenuPtr->currentID);
+				SendReg(s);
+			}
 		}
-		else if (user.GetStatus() && user.GetSmth()) {
+		else if (user.GetStatus() && user.GetSmth()) {             //Admin 
 			if (MenuPtr->currentID == "1") {
 				SendRequest(s, "1_" + MenuPtr->currentID);
 				SendAdd(s);
 			}
 			else if (MenuPtr->currentID == "2") {
 				SendRequest(s, "1_" + MenuPtr->currentID);
-				SendShow(s);
+				AdminSendShow(s);
+			}
+		}
+		else if (!user.GetStatus() && user.GetSmth()) {             //User 
+			if (MenuPtr->currentID == "1") {
+				SendRequest(s, "2_" + MenuPtr->currentID);
+				UserSendShow(s);
+			}
+			if (MenuPtr->currentID == "2") {
+				SendRequest(s, "2_" + MenuPtr->currentID);
+				SendSearch(s);
 			}
 		}
 		if (unreg == true) {

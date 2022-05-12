@@ -19,8 +19,15 @@ public:
 		stream >> obj.group >> obj.code >> obj.name >> obj.cost >> obj.dealer;
 		return stream;
 	}
-	void getFields(char* _group, char* _name, char* _cost) {
+	void getFields_to_User(char* _group, char* _name, char* _cost) {
 		strcpy(_group, group.c_str());
+		strcpy(_name, name.c_str());
+		strcpy(_cost, cost.c_str());
+	}
+	void getFields_to_Admin(char* _group, char* _name, char* _cost, char* _code, char* _dealer) {
+		strcpy(_group, group.c_str());
+		strcpy(_code, code.c_str());
+		strcpy(_dealer, dealer.c_str());
 		strcpy(_name, name.c_str());
 		strcpy(_cost, cost.c_str());
 	}

@@ -89,8 +89,10 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	string _log;
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
-		if (buf[0] == '0') {
-			if (!strcmp(buf, "0_1")) {
+		if (buf[0] == '0') 
+		{
+			if (!strcmp(buf, "0_0")) cout << "client N-" << numcl << " unauthorised\n";
+			else if (!strcmp(buf, "0_1")) {
 				bool exist = false;
 				char lbuf[100], pbuf[100];
 				recv(s2, lbuf, 100, 0);
@@ -141,7 +143,8 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				}
 			}
 		}
-		else if (buf[0] == '1') {
+		else if (buf[0] == '1') 
+		{
 			if (!strcmp(buf, "1_1")) {
 				*buf = '\0';
 				string group, name, dealer;
@@ -165,8 +168,48 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				vector<Product>::iterator ptr = bak.begin();
 
 				for (; ptr != bak.end(); ptr++) {
+					char group[100], name[100], cost[100], dealer[100], code[100];
+					ptr->getFields_to_Admin(group, name, cost, code, dealer);
+					send(s2, group, sizeof(group), 0);
+					send(s2, name, sizeof(name), 0);
+					send(s2, cost, sizeof(cost), 0);
+					send(s2, code, sizeof(code), 0);
+					send(s2, dealer, sizeof(dealer), 0);
+				}
+
+				ptr = kons.begin();
+
+				for (; ptr != kons.end(); ptr++) {
+					char group[100], name[100], cost[100], dealer[100], code[100];
+					ptr->getFields_to_Admin(group, name, cost, code, dealer);
+					send(s2, group, sizeof(group), 0);
+					send(s2, name, sizeof(name), 0);
+					send(s2, cost, sizeof(cost), 0);
+					send(s2, code, sizeof(code), 0);
+					send(s2, dealer, sizeof(dealer), 0);
+				}
+
+				ptr = masl.begin();
+
+				for (; ptr != masl.end(); ptr++) {
+					char group[100], name[100], cost[100], dealer[100], code[100];
+					ptr->getFields_to_Admin(group, name, cost, code, dealer);
+					send(s2, group, sizeof(group), 0);
+					send(s2, name, sizeof(name), 0);
+					send(s2, cost, sizeof(cost), 0);
+					send(s2, code, sizeof(code), 0);
+					send(s2, dealer, sizeof(dealer), 0);
+				}
+				send(s2, "0", sizeof("0"), 0);
+			}
+		}
+		else if (buf[0] == '2'){
+			if (!strcmp(buf, "2_1")){
+				vector<Product>::iterator ptr = bak.begin();
+
+				for (; ptr != bak.end(); ptr++) {
 					char group[100], name[100], cost[100];
-					ptr->getFields(group, name, cost);
+					ptr->getFields_to_User(group, name, cost);
 					send(s2, group, sizeof(group), 0);
 					send(s2, name, sizeof(name), 0);
 					send(s2, cost, sizeof(cost), 0);
@@ -175,8 +218,8 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				ptr = kons.begin();
 
 				for (; ptr != kons.end(); ptr++) {
-					char group[100], name[100], cost[100];
-					ptr->getFields(group, name, cost);
+					char group[100], name[100], cost[100], dealer[100], code[100];
+					ptr->getFields_to_User(group, name, cost);
 					send(s2, group, sizeof(group), 0);
 					send(s2, name, sizeof(name), 0);
 					send(s2, cost, sizeof(cost), 0);
@@ -185,18 +228,57 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				ptr = masl.begin();
 
 				for (; ptr != masl.end(); ptr++) {
-					char group[100], name[100], cost[100];
-					ptr->getFields(group, name, cost);
+					char group[100], name[100], cost[100], dealer[100], code[100];
+					ptr->getFields_to_User(group, name, cost);
 					send(s2, group, sizeof(group), 0);
 					send(s2, name, sizeof(name), 0);
 					send(s2, cost, sizeof(cost), 0);
 				}
 				send(s2, "0", sizeof("0"), 0);
 			}
+			else if (!strcmp(buf, "2_2")) {
+				char str[100];
+				recv(s2, str, sizeof(str), 0);
+				recv(s2, str, sizeof(str), 0);
+
+				vector<Product>::iterator ptr = bak.begin();
+
+				for (; ptr != bak.end(); ptr++) {
+					char group[100], name[100], cost[100];
+					ptr->getFields_to_User(group, name, cost);
+					if (strstr(group, str) || strstr(name, str)) {
+						send(s2, group, sizeof(group), 0);
+						send(s2, name, sizeof(name), 0);
+						send(s2, cost, sizeof(cost), 0);
+					}
+				}
+
+				ptr = kons.begin();
+
+				for (; ptr != kons.end(); ptr++) {
+					char group[100], name[100], cost[100];
+					ptr->getFields_to_User(group, name, cost);
+					if (strstr(group, str) || strstr(name, str)) {
+						send(s2, group, sizeof(group), 0);
+						send(s2, name, sizeof(name), 0);
+						send(s2, cost, sizeof(cost), 0);
+					}
+				}
+
+				ptr = masl.begin();
+
+				for (; ptr != masl.end(); ptr++) {
+					char group[100], name[100], cost[100], dealer[100], code[100];
+					ptr->getFields_to_User(group, name, cost);
+					if (strstr(group, str) || strstr(name, str)) {
+						send(s2, group, sizeof(group), 0);
+						send(s2, name, sizeof(name), 0);
+						send(s2, cost, sizeof(cost), 0);
+					}
+				}
+				send(s2, "0", sizeof("0"), 0);
+			}
 		}
-		else if (buf[0] == '2'){}
-		
-		else if (!strcmp(buf, "0_0")) cout << "client N-" << numcl << " unauthorised\n";
 		*buf = '\0';
 	}
 	
