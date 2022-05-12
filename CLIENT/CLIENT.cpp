@@ -19,10 +19,10 @@ Menu RegMenu, UserMenu, AdminMenu;
 Menu* MenuPtr = &RegMenu;
 bool unreg = false;
 
-void SendRequest(SOCKET soc, string id) {
-	char buf[100];
-	strcpy(buf, id.c_str());
-	send(soc, buf, sizeof(buf), 0);
+void Replace(char* buf, char replace, char to) {
+	for (int i = 0; i < 60; i++) {
+		if (buf[i] == replace) buf[i] = to;
+	}
 }
 
 class User {
@@ -43,6 +43,12 @@ public:
 };
 
 User user;
+
+void SendRequest(SOCKET soc, string id) {
+	char buf[100];
+	strcpy(buf, id.c_str());
+	send(soc, buf, sizeof(buf), 0);
+}
 
 void SendReg(SOCKET soc) {
 	string log, pass;
@@ -79,6 +85,93 @@ void Unreg() {
 	unreg = true;
 }
 
+void SendAdd(SOCKET soc) {
+	Menu menu;
+	char buf[100];
+	menu.SetHeader("Группа товара");
+
+	menu.CreateMenu(3, "Бакалея", "Консервация", "Масла,уксусы");
+
+	bool running = true;
+	while (running) {
+		menu.ShowMenu();
+		menu.Navigation(&running);
+
+		if (menu.currentID == "1") {
+			system("cls");
+			send(soc, "Бакалея", sizeof("Бакалея"), 0);
+			cout << "Введите код товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите название товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите стоимость товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите поставщика товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+
+			running = false;
+		}
+		else if (menu.currentID == "2") {
+			system("cls");
+			send(soc, "Консервация", sizeof("Консервация"), 0);
+			cout << "Введите код товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите название товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите стоимость товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите поставщика товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+
+			running = false;
+		}
+		else if (menu.currentID == "3") {
+			system("cls");
+			send(soc, "Масла,уксусы", sizeof("Масла,уксусы"), 0);
+			cout << "Введите код товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите название товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите стоимость товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+			cout << "Введите поставщика товара: ";
+			cin >> buf;
+			send(soc, buf, 100, 0); *buf = '\0';
+
+			running = false;
+		}
+	}
+}
+void SendShow(SOCKET soc) {
+	system("cls");
+	cout << "+---------------+--------------------------------------------------+-----+\n";
+	cout << "|     Группа    |                     Название                     | Цена|\n";
+	cout << "+---------------+--------------------------------------------------+-----+\n";
+	char group[100], name[100], cost[100];
+	while (true) {
+		recv(soc, group, sizeof(group), 0);
+		if (strcmp(group, "0")) {
+			recv(soc, name, sizeof(name), 0);
+			Replace(name, '_', ' ');
+			recv(soc, cost, sizeof(cost), 0);
+			printf("|%15s|%50s|%5s|\n", group, name, cost);
+			cout << "+---------------+--------------------------------------------------+-----+\n";
+		}
+		else break;
+	}
+	_getch();
+}
 
 void main() {
 	WORD wVersionRequested;
@@ -99,9 +192,9 @@ void main() {
 	{
 		UserMenu.function[1] = Unreg;
 	}
-	AdminMenu.CreateMenu(2, "Админ", "Выйти из уч.з.");
+	AdminMenu.CreateMenu(3, "Добавить товар", "Показать товары", "Выйти из уч.з.");
 	{
-		AdminMenu.function[1] = Unreg;
+		AdminMenu.function[2] = Unreg;
 	}
 	
 
@@ -111,12 +204,25 @@ void main() {
 		else if (!user.GetStatus() && !user.GetSmth()) MenuPtr = &RegMenu;
 		else if (user.GetStatus() && user.GetSmth()) MenuPtr = &AdminMenu;
 
+		MenuPtr->currentID = "0";
 		MenuPtr->ShowMenu();
 		MenuPtr->Navigation(&running);
 
-		if (!user.GetStatus() && !user.GetSmth() && MenuPtr->currentID == "1") {
-			SendRequest(s, "0_" + MenuPtr->currentID);
-			SendReg(s);
+		if (!user.GetStatus() && !user.GetSmth()) {
+			if (MenuPtr->currentID == "1") {
+				SendRequest(s, "0_" + MenuPtr->currentID);
+				SendReg(s);
+			}
+		}
+		else if (user.GetStatus() && user.GetSmth()) {
+			if (MenuPtr->currentID == "1") {
+				SendRequest(s, "1_" + MenuPtr->currentID);
+				SendAdd(s);
+			}
+			else if (MenuPtr->currentID == "2") {
+				SendRequest(s, "1_" + MenuPtr->currentID);
+				SendShow(s);
+			}
 		}
 		if (unreg == true) {
 			SendRequest(s, "0_0");
