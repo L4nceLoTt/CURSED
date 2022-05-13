@@ -10,6 +10,7 @@
 #include <sstream>
 #include <deque>
 #include <vector>
+#include <map>
 #include <stdexcept>
 #include <algorithm>
 

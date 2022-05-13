@@ -147,9 +147,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 		{
 			if (!strcmp(buf, "1_1")) {
 				*buf = '\0';
-				string group, name, dealer;
-				string code;
-				string cost;
+				string group, name, dealer, code, cost, amount;
 				recv(s2, buf, 100, 0); group = buf; *buf = '\0';
 				recv(s2, buf, 100, 0); group = buf; *buf = '\0';
 				recv(s2, buf, 100, 0); code = buf; *buf = '\0';
@@ -157,8 +155,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				recv(s2, buf, 100, 0); cost = buf; *buf = '\0';
 				recv(s2, buf, 100, 0); dealer = buf; *buf = '\0';
 
-
-				Product prod(group, code, name, cost, dealer);
+				Product prod(group, code, name, cost, dealer, 0);
 
 				if (group == "Бакалея") bak.push_back(prod);
 				else if (group == "Консервация") kons.push_back(prod);
