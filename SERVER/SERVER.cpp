@@ -21,61 +21,51 @@ int numcl = 0;
 ifstream Afile;
 ifstream Ufile;
 
-vector<Product> bak, kons, masl;
+vector<Product> arr;
 
 void Init() {
-	vector<Product>::iterator ptr = bak.begin();
+	vector<Product>::iterator ptr = arr.begin();
 	ifstream Bak, Kons, Masl;
 	Product tmp;
 
 	Bak.open("Бакалея.txt", ios::in);
 	while (Bak) {
 		Bak >> tmp;
-		bak.push_back(tmp);
+		arr.push_back(tmp);
 	}
-	bak.erase(bak.end() - 1);
+	arr.erase(arr.end() - 1);
 	Bak.close();
 
-	ptr = kons.begin();
 	Kons.open("Консервация.txt", ios::in);
 	while (Kons) {
 		Kons >> tmp;
-		kons.push_back(tmp);
+		arr.push_back(tmp);
 	}
-	kons.erase(kons.end() - 1);
+	arr.erase(arr.end() - 1);
 	Kons.close();
 
-	ptr = masl.begin();
 	Masl.open("Маслауксусы.txt", ios::in);
 	while (Masl) {
 		Masl >> tmp;
-		masl.push_back(tmp);
+		arr.push_back(tmp);
 	}
-	masl.erase(masl.end() - 1);
+	arr.erase(arr.end() - 1);
 	Masl.close();
 }
 void Save() {
-	vector<Product>::iterator ptr = bak.begin();
+	vector<Product>::iterator ptr = arr.begin();
 	ofstream Bak, Kons, Masl;
 
 	Bak.open("Бакалея.txt", ios::out);
-	for (; ptr != bak.end(); ptr++) {
-		Bak << *ptr;
+	Kons.open("Консервация.txt", ios::out);
+	Masl.open("Маслауксусы.txt", ios::out);
+	for (; ptr != arr.end(); ptr++) {
+		if (ptr->GetGroup() == "Бакалея") Bak << *ptr;
+		else if (ptr->GetGroup() == "Консервация") Kons << *ptr;
+		else if (ptr->GetGroup() == "Масла,уксусы") Masl << *ptr;
 	}
 	Bak.close();
-
-	ptr = kons.begin();
-	Kons.open("Консервация.txt", ios::out);
-	for (; ptr != kons.end(); ptr++) {
-		Kons << *ptr;
-	}
 	Kons.close();
-
-	ptr = masl.begin();
-	Masl.open("Маслауксусы.txt", ios::out);
-	for (; ptr != masl.end(); ptr++) {
-		Masl << *ptr;
-	}
 	Masl.close();
 }
 
@@ -91,39 +81,13 @@ void AddProd(SOCKET s2, char* buf) {
 
 	Product prod(group, code, name, cost, dealer, 0);
 
-	if (group == "Бакалея") bak.push_back(prod);
-	else if (group == "Консервация") kons.push_back(prod);
-	else if (group == "Масла,уксусы") masl.push_back(prod);
+	arr.push_back(prod);
 }
 
 void ShowProdAdmin(SOCKET s2, char* buf) {
-	vector<Product>::iterator ptr = bak.begin();
+	vector<Product>::iterator ptr = arr.begin();
 
-	for (; ptr != bak.end(); ptr++) {
-		char group[100], name[100], cost[100], dealer[100], code[100];
-		ptr->getFields_to_Admin(group, name, cost, code, dealer);
-		send(s2, group, sizeof(group), 0);
-		send(s2, name, sizeof(name), 0);
-		send(s2, cost, sizeof(cost), 0);
-		send(s2, code, sizeof(code), 0);
-		send(s2, dealer, sizeof(dealer), 0);
-	}
-
-	ptr = kons.begin();
-
-	for (; ptr != kons.end(); ptr++) {
-		char group[100], name[100], cost[100], dealer[100], code[100];
-		ptr->getFields_to_Admin(group, name, cost, code, dealer);
-		send(s2, group, sizeof(group), 0);
-		send(s2, name, sizeof(name), 0);
-		send(s2, cost, sizeof(cost), 0);
-		send(s2, code, sizeof(code), 0);
-		send(s2, dealer, sizeof(dealer), 0);
-	}
-
-	ptr = masl.begin();
-
-	for (; ptr != masl.end(); ptr++) {
+	for (; ptr != arr.end(); ptr++) {
 		char group[100], name[100], cost[100], dealer[100], code[100];
 		ptr->getFields_to_Admin(group, name, cost, code, dealer);
 		send(s2, group, sizeof(group), 0);
@@ -135,30 +99,10 @@ void ShowProdAdmin(SOCKET s2, char* buf) {
 	send(s2, "0", sizeof("0"), 0);
 }
 void ShowProdUser(SOCKET s2, char* buf) {
-	vector<Product>::iterator ptr = bak.begin();
+	vector<Product>::iterator ptr = arr.begin();
 
-	for (; ptr != bak.end(); ptr++) {
+	for (; ptr != arr.end(); ptr++) {
 		char group[100], name[100], cost[100];
-		ptr->getFields_to_User(group, name, cost);
-		send(s2, group, sizeof(group), 0);
-		send(s2, name, sizeof(name), 0);
-		send(s2, cost, sizeof(cost), 0);
-	}
-
-	ptr = kons.begin();
-
-	for (; ptr != kons.end(); ptr++) {
-		char group[100], name[100], cost[100], dealer[100], code[100];
-		ptr->getFields_to_User(group, name, cost);
-		send(s2, group, sizeof(group), 0);
-		send(s2, name, sizeof(name), 0);
-		send(s2, cost, sizeof(cost), 0);
-	}
-
-	ptr = masl.begin();
-
-	for (; ptr != masl.end(); ptr++) {
-		char group[100], name[100], cost[100], dealer[100], code[100];
 		ptr->getFields_to_User(group, name, cost);
 		send(s2, group, sizeof(group), 0);
 		send(s2, name, sizeof(name), 0);
@@ -167,35 +111,9 @@ void ShowProdUser(SOCKET s2, char* buf) {
 	send(s2, "0", sizeof("0"), 0);
 }
 void ShowProdWarehouse(SOCKET s2, char* buf) {
-	vector<Product>::iterator ptr = bak.begin();
+	vector<Product>::iterator ptr = arr.begin();
 
-	for (; ptr != bak.end(); ptr++) {
-		char group[100], name[100], cost[100], dealer[100], code[100], amount[100];
-		ptr->getFields_to_Warehouse(group, name, cost, code, dealer, amount);
-		send(s2, group, sizeof(group), 0);
-		send(s2, name, sizeof(name), 0);
-		send(s2, cost, sizeof(cost), 0);
-		send(s2, code, sizeof(code), 0);
-		send(s2, dealer, sizeof(dealer), 0);
-		send(s2, amount, sizeof(amount), 0);
-	}
-
-	ptr = kons.begin();
-
-	for (; ptr != kons.end(); ptr++) {
-		char group[100], name[100], cost[100], dealer[100], code[100], amount[100];
-		ptr->getFields_to_Warehouse(group, name, cost, code, dealer, amount);
-		send(s2, group, sizeof(group), 0);
-		send(s2, name, sizeof(name), 0);
-		send(s2, cost, sizeof(cost), 0);
-		send(s2, code, sizeof(code), 0);
-		send(s2, dealer, sizeof(dealer), 0);
-		send(s2, amount, sizeof(amount), 0);
-	}
-
-	ptr = masl.begin();
-
-	for (; ptr != masl.end(); ptr++) {
+	for (; ptr != arr.end(); ptr++) {
 		char group[100], name[100], cost[100], dealer[100], code[100], amount[100];
 		ptr->getFields_to_Warehouse(group, name, cost, code, dealer, amount);
 		send(s2, group, sizeof(group), 0);
@@ -213,34 +131,10 @@ void SearchProd(SOCKET s2, char* buf) {
 	recv(s2, str, sizeof(str), 0);
 	recv(s2, str, sizeof(str), 0);
 
-	vector<Product>::iterator ptr = bak.begin();
+	vector<Product>::iterator ptr = arr.begin();
 
-	for (; ptr != bak.end(); ptr++) {
+	for (; ptr != arr.end(); ptr++) {
 		char group[100], name[100], cost[100];
-		ptr->getFields_to_User(group, name, cost);
-		if (strstr(group, str) || strstr(name, str)) {
-			send(s2, group, sizeof(group), 0);
-			send(s2, name, sizeof(name), 0);
-			send(s2, cost, sizeof(cost), 0);
-		}
-	}
-
-	ptr = kons.begin();
-
-	for (; ptr != kons.end(); ptr++) {
-		char group[100], name[100], cost[100];
-		ptr->getFields_to_User(group, name, cost);
-		if (strstr(group, str) || strstr(name, str)) {
-			send(s2, group, sizeof(group), 0);
-			send(s2, name, sizeof(name), 0);
-			send(s2, cost, sizeof(cost), 0);
-		}
-	}
-
-	ptr = masl.begin();
-
-	for (; ptr != masl.end(); ptr++) {
-		char group[100], name[100], cost[100], dealer[100], code[100];
 		ptr->getFields_to_User(group, name, cost);
 		if (strstr(group, str) || strstr(name, str)) {
 			send(s2, group, sizeof(group), 0);
@@ -249,6 +143,13 @@ void SearchProd(SOCKET s2, char* buf) {
 		}
 	}
 	send(s2, "0", sizeof("0"), 0);
+}
+
+void AdminOrder(SOCKET s2, char* buf){
+	ShowProdWarehouse(s2, buf);
+	*buf = '\0';
+	recv(s2, buf, sizeof(buf), 0);
+	
 }
 
 DWORD WINAPI ThreadFunc(LPVOID client_socket)
@@ -320,6 +221,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 			if (!strcmp(buf, "1_1")) AddProd(s2, buf);
 			else if (!strcmp(buf, "1_2")) ShowProdAdmin(s2, buf);
 			else if (!strcmp(buf, "1_31")) ShowProdWarehouse(s2, buf);
+			else if (!strcmp(buf, "1_32")) AdminOrder(s2, buf);
 		}
 		else if (buf[0] == '2'){
 			if (!strcmp(buf, "2_1")) ShowProdUser(s2, buf);

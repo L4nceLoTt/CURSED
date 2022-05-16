@@ -40,4 +40,5 @@ public:
 		strcpy(_cost, cost.c_str());
 		strcpy(_amount, amount.c_str());
 	}
+	string GetGroup() { return group; }
 };

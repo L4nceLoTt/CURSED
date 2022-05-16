@@ -77,7 +77,6 @@ void SendReg(SOCKET soc) {
 	else {
 		system("cls");
 		cout << "Ошибка авторизации";
-		_getch();
 	}
 }
 void Unreg() {
@@ -173,7 +172,6 @@ void AdminSendShow(SOCKET soc) {
 		}
 		else break;
 	}
-	_getch();
 }
 void UserSendShow(SOCKET soc) {
 	system("cls");
@@ -192,7 +190,6 @@ void UserSendShow(SOCKET soc) {
 		}
 		else break;
 	}
-	_getch();
 }
 void AdminSendShowWarehouse(SOCKET soc) {
 	system("cls");
@@ -217,6 +214,10 @@ void AdminSendShowWarehouse(SOCKET soc) {
 		else break;
 	}
 	_getch();
+}
+
+void WarehouseOrder(SOCKET soc) {
+	AdminSendShowWarehouse(soc);
 }
 
 void SendSearch(SOCKET soc) {
@@ -247,7 +248,6 @@ void SendSearch(SOCKET soc) {
 		printf("|                         Совпадений не найдено                          |\n");
 		printf("+------------------------------------------------------------------------+\n");
 	}
-	_getch();
 }
 
 void main() {
@@ -295,6 +295,7 @@ void main() {
 				SendRequest(s, "0_" + MenuPtr->currentID);
 				SendReg(s);
 			}
+			_getch();
 		}
 		else if (user.GetStatus() && user.GetSmth()) {             //Admin 
 			if (MenuPtr->currentID == "1") {
@@ -309,6 +310,11 @@ void main() {
 				SendRequest(s, "1_" + MenuPtr->currentID);
 				AdminSendShowWarehouse(s);
 			}
+			else if (MenuPtr->currentID == "32") {
+				SendRequest(s, "1_" + MenuPtr->currentID);
+				WarehouseOrder(s);
+			}
+			_getch();
 		}
 		else if (!user.GetStatus() && user.GetSmth()) {             //User 
 			if (MenuPtr->currentID == "1") {
@@ -319,6 +325,7 @@ void main() {
 				SendRequest(s, "2_" + MenuPtr->currentID);
 				SendSearch(s);
 			}
+			_getch();
 		}
 		if (unreg == true) {
 			SendRequest(s, "0_0");
