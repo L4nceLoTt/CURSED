@@ -194,6 +194,30 @@ void UserSendShow(SOCKET soc) {
 	}
 	_getch();
 }
+void AdminSendShowWarehouse(SOCKET soc) {
+	system("cls");
+	cout << "+----+--------+---------------+--------------------------------------------------+-----+---------------+------+\n";
+	cout << "|  № |   Код  |     Группа    |                     Название                     | Цена|    Постащик   |Кол-во|\n";
+	cout << "+----+--------+---------------+--------------------------------------------------+-----+---------------+------+\n";
+	char group[100], name[100], cost[100], code[100], dealer[100], amount[100];
+	int i = 1;
+	while (true) {
+		recv(soc, group, sizeof(group), 0);
+		if (strcmp(group, "0")) {
+			recv(soc, name, sizeof(name), 0);
+			Replace(name, '_', ' ');
+			recv(soc, cost, sizeof(cost), 0);
+			recv(soc, code, sizeof(code), 0);
+			recv(soc, dealer, sizeof(dealer), 0);
+			recv(soc, amount, sizeof(amount), 0);
+			printf("|%4d|%8s|%15s|%50s|%5s|%15s|%6s|\n", i, code, group, name, cost, dealer, amount);
+			cout << "+----+--------+---------------+--------------------------------------------------+-----+---------------+------+\n";
+			i++;
+		}
+		else break;
+	}
+	_getch();
+}
 
 void SendSearch(SOCKET soc) {
 	system("cls");
@@ -245,9 +269,10 @@ void main() {
 	{
 		UserMenu.function[2] = Unreg;
 	}
-	AdminMenu.CreateMenu(3, "Добавить товар", "Показать товары", "Выйти из уч.з.");
+	AdminMenu.CreateMenu(4, "Добавить наим-ние", "Показать наим-ния", "Склад", "Выйти из уч.з.");
 	{
-		AdminMenu.function[2] = Unreg;
+		AdminMenu.sub[2].CreateMenu(2, "Показать товары", "Заказать товар");
+		AdminMenu.function[3] = Unreg;
 	}
 	
 
@@ -279,6 +304,10 @@ void main() {
 			else if (MenuPtr->currentID == "2") {
 				SendRequest(s, "1_" + MenuPtr->currentID);
 				AdminSendShow(s);
+			}
+			else if (MenuPtr->currentID == "31") {
+				SendRequest(s, "1_" + MenuPtr->currentID);
+				AdminSendShowWarehouse(s);
 			}
 		}
 		else if (!user.GetStatus() && user.GetSmth()) {             //User 

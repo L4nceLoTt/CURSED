@@ -27,7 +27,7 @@ public:
 
 	string MakeID(Menu* ptr) {
 		if (ptr->parent != NULL) {
-			return  ptr->id += MakeID(ptr->parent);
+			return  ptr->id = MakeID(ptr->parent) + ptr->id;
 		}
 		return "\0";
 	}
@@ -110,14 +110,14 @@ public:
 		else if (keycap == 72) main->paragraph--;
 		else if (keycap == 13) {
 			if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr != NULL) {
+				currentID = MakeID(&main->sub[paragraph - 1]);
 				main = &main->sub[main->paragraph - 1];
-				currentID = MakeID(main);
 			}
-			else if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr == NULL) currentID = MakeID(&main->sub[paragraph- 1]);
+			else if (main->function[main->paragraph - 1] == NULL && main->sub[main->paragraph - 1].arr == NULL) currentID = MakeID(&main->sub[main->paragraph- 1]);
 			else if (main->function[main->paragraph - 1] != NULL) {
 				system("cls");
 				main->function[main->paragraph - 1]();
-				currentID = MakeID(main);
+				currentID = MakeID(&main->sub[main->paragraph - 1]);
 				_getch();
 			}
 		}
@@ -125,7 +125,7 @@ public:
 			if (main->parent != NULL) {
 				main->paragraph = 1;
 				main = main->parent;
-				currentID = MakeID(main);
+				currentID = MakeID(&main->sub[paragraph - 1]);
 			}
 			else if (main->parent == NULL) {
 				*running = false;
