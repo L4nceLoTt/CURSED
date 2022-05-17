@@ -26,10 +26,13 @@ public:
 	Menu() { countParam = 0; paragraph = 1; arr = NULL; border = 0; sub = NULL; id = "0"; }
 
 	string MakeID(Menu* ptr) {
-		if (ptr->parent != NULL) {
-			return  ptr->id = MakeID(ptr->parent) + ptr->id;
+		string num;
+		while (ptr->parent != NULL) {
+			num += ptr->id;
+			ptr = ptr->parent;
 		}
-		return "\0";
+		reverse(num.begin(), num.end());
+		return num;
 	}
 
 	void SetHeader(string head) {
