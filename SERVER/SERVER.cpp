@@ -80,9 +80,7 @@ void AddProd(SOCKET s2, char* buf) {
 	recv(s2, buf, 100, 0); cost = buf; *buf = '\0';
 	recv(s2, buf, 100, 0); dealer = buf; *buf = '\0';
 
-	Product prod(group, code, name, cost, dealer, 0);
-
-	arr.push_back(prod);
+	arr.push_back(Product(group, code, name, cost, dealer, "0"));
 }
 
 void ShowProdAdmin(SOCKET s2, char* buf) {
