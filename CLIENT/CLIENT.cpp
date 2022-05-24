@@ -197,6 +197,42 @@ void UserSendShow(SOCKET soc) {
 	}
 }
 void AdminSendShowWarehouse(SOCKET soc) {
+	Menu getCity;
+
+	getCity.CreateMenu(6, "Минск", "Витебск", "Брест", "Гродно", "Гомель", "Могилёв");
+
+	bool running = true;
+	while (running) {
+		getCity.ShowMenu();
+		getCity.Navigation(&running);
+
+		if (getCity.currentID == "1") {
+			send(soc, "Минск", sizeof("Минск"), 0);
+			running = false;
+		}
+		else if (getCity.currentID == "2") {
+			send(soc, "Витебск", sizeof("Витебск"), 0);
+			running = false;
+		}
+		else if (getCity.currentID == "3") {
+			send(soc, "Брест", sizeof("Брест"), 0);
+			running = false;
+		}
+		else if (getCity.currentID == "4") {
+			send(soc, "Гродно", sizeof("Гродно"), 0);
+			running = false;
+		}
+		else if (getCity.currentID == "5") {
+			send(soc, "Гомель", sizeof("Гомель"), 0);
+			running = false;
+		}
+		else if (getCity.currentID == "6") {
+			send(soc, "Могилёв", sizeof("Могилёв"), 0);
+			running = false;
+		}
+	}
+
+
 	system("cls");
 	cout << "+----+--------+---------------+--------------------------------------------------+-----+---------------+------+\n";
 	cout << "|  № |   Код  |     Группа    |                     Название                     | Цена|    Постащик   |Кол-во|\n";

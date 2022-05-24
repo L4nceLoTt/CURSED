@@ -9,7 +9,7 @@ class Product {
 	string amount;
 
 public:
-	Product(){};
+	Product() {};
 	Product(string _group, string _code, string _name, string _cost, string _dealer, string _amount) : group(_group), code(_code), name(_name), cost(_cost), dealer(_dealer), amount(_amount) {};
 
 	friend ofstream& operator<<(ofstream& stream, Product& obj) {
@@ -41,7 +41,7 @@ public:
 		strcpy(_amount, amount.c_str());
 	}
 	string GetGroup() { return group; }
-	void AddAmount(char* adding){
+	void AddAmount(char* adding) {
 		char _amount[100];
 		int _adding = atoi(adding);
 		int _amount_ = atoi(amount.c_str());

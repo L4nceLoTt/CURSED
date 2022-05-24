@@ -24,6 +24,11 @@ ifstream Ufile;
 vector<Product> arr;
 vector<Product> cart;
 
+map<string, vector<Product>> warehouses;
+vector<string> cities = { "Минск", "Витебск", "Брест", "Гродно", "Гомель", "Могилёв" };
+
+char city[100];
+
 void Init() {
 	vector<Product>::iterator ptr = arr.begin();
 	ifstream Bak, Kons, Masl;
@@ -34,7 +39,7 @@ void Init() {
 		Bak >> tmp;
 		arr.push_back(tmp);
 	}
-	arr.erase(arr.end() - 1);
+	if (Bak.eof()) arr.erase(arr.end() - 1);
 	Bak.close();
 
 	Kons.open("Консервация.txt", ios::in);
@@ -42,7 +47,7 @@ void Init() {
 		Kons >> tmp;
 		arr.push_back(tmp);
 	}
-	arr.erase(arr.end() - 1);
+	if (Kons.eof()) arr.erase(arr.end() - 1);
 	Kons.close();
 
 	Masl.open("Маслауксусы.txt", ios::in);
@@ -50,8 +55,28 @@ void Init() {
 		Masl >> tmp;
 		arr.push_back(tmp);
 	}
-	arr.erase(arr.end() - 1);
+	if (Masl.eof()) arr.erase(arr.end() - 1);
 	Masl.close();
+
+	for (vector<string>::iterator _ptr = cities.begin(); _ptr != cities.end(); _ptr++) {
+		vector<Product> _tmp_;
+		Product _tmp;
+
+		ifstream f;
+		string filename = *_ptr;
+		filename += ".txt";
+		f.open(filename.c_str(), ios::in);
+
+		while (f) {
+			f >> _tmp;
+			_tmp_.push_back(_tmp);
+		}
+		if (!_tmp_.empty()) _tmp_.erase(_tmp_.end() - 1);
+
+		warehouses.insert(pair<string, vector<Product>>(*_ptr, _tmp_));
+
+		f.close();
+	}
 }
 void Save() {
 	vector<Product>::iterator ptr = arr.begin();
@@ -68,6 +93,19 @@ void Save() {
 	Bak.close();
 	Kons.close();
 	Masl.close();
+
+	for (vector<string>::iterator ptr = cities.begin(); ptr != cities.end(); ptr++) {
+		map<string, vector<Product>>::iterator point = warehouses.find(*ptr);
+		string filename = *ptr;
+		filename += ".txt";
+
+		ofstream f;
+		f.open(filename.c_str(), ios::out);
+		for (vector<Product>::iterator i = point->second.begin(); i != point->second.end(); i++) {
+			f << *i;
+		}
+		f.close();
+	}
 }
 
 void AddProd(SOCKET s2, char* buf) {
@@ -81,6 +119,11 @@ void AddProd(SOCKET s2, char* buf) {
 	recv(s2, buf, 100, 0); dealer = buf; *buf = '\0';
 
 	arr.push_back(Product(group, code, name, cost, dealer, "0"));
+
+	for (vector<string>::iterator i = cities.begin(); i != cities.end(); i++) {
+		map<string, vector<Product>>::iterator ptr = warehouses.find(*i);
+		ptr->second.push_back(arr[arr.size() - 1]);
+	}
 }
 
 void ShowProdAdmin(SOCKET s2, char* buf) {
@@ -119,7 +162,12 @@ void ShowProdUser(SOCKET s2, char* buf) {
 void ShowProdWarehouse(SOCKET s2, char* buf) {
 	vector<Product>::iterator ptr = arr.begin();
 
-	for (; ptr != arr.end(); ptr++) {
+	recv(s2, city, 100, 0);
+	recv(s2, city, 100, 0);
+
+	map<string, vector<Product>>::iterator i = warehouses.find(city);
+
+	for (vector<Product>::iterator ptr = i->second.begin(); ptr != i->second.end(); ptr++) {
 		char group[100], name[100], cost[100], dealer[100], code[100], amount[100];
 		ptr->getFields_to_Warehouse(group, name, cost, code, dealer, amount);
 		send(s2, group, sizeof(group), 0);
@@ -159,12 +207,13 @@ void SearchProd(SOCKET s2, char* buf) {
 }
 
 void AdminOrder(SOCKET s2){
+	map<string, vector<Product>>::iterator i = warehouses.find(city);
+
 	char buf[100], amount[100];
 	recv(s2, buf, sizeof(buf), 0);
-	recv(s2, buf, sizeof(buf), 0);
 	recv(s2, amount, sizeof(amount), 0);
-	int i = atoi(buf);
-	if (!(i < 0 || i > arr.size())) arr[i].AddAmount(amount);
+	int ind = atoi(buf);
+	if (!(ind < 0 || ind > i->second.size())) i->second[ind].AddAmount(amount);
 }
 
 void AddToCart(SOCKET s2) {
