@@ -376,6 +376,7 @@ void PayCart(SOCKET soc) {
 }
 
 void main() {
+	srand(time(NULL));
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	int err;

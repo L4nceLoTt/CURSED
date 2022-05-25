@@ -13,11 +13,15 @@
 #include "Classes.h"
 #include "Libs.h"
 
+#define COLUMN 6
+#define LINE 2
+
 #pragma warning(disable : 4996)
 
 using namespace std;
 
 int numcl = 0;
+int priority = 0;
 ifstream Afile;
 ifstream Ufile;
 
@@ -28,6 +32,56 @@ map<string, vector<Product>> warehouses;
 vector<string> cities = { "Минск", "Витебск", "Брест", "Гродно", "Гомель", "Могилёв" };
 
 char city[100];
+
+void FisherYates(int* arr, int size) {
+	vector<int> tmp;
+
+	for (int i = 0; i < size; i++) {
+		tmp.push_back(*(arr + i));
+	}
+
+	for (int i = 0; i < size; i++) {
+		int ind = 1 + rand() % tmp.size();
+		*(arr + i) = tmp[ind - 1];
+		tmp.erase(tmp.begin() + ind - 1);
+	}
+}
+int FindMax(double* arr, int size) {
+	int maxID = 0;
+	double max = 0;
+
+	for (int i = 0; i < size; i++) {
+		if (arr[i] > max) {
+			max = arr[i];
+			maxID = i;
+		}
+	}
+
+	return maxID;
+}
+int ExpertMethod() {
+	int arr1[COLUMN] = { 1, 2, 3, 4, 5, 6 };
+	int arr2[COLUMN] = { 1, 2, 3, 4, 5, 6 };
+	int* total = new int[6];
+	int sum = 0;
+
+	FisherYates(arr1, 6);
+	FisherYates(arr2, 6);
+
+	for (int i = 0; i < COLUMN; i++) {
+		arr1[i] = COLUMN - arr1[i];
+		arr2[i] = COLUMN - arr2[i];
+		total[i] = arr1[i] + arr2[i];
+		sum += total[i];
+	}
+
+	double* weights = new double[6];
+	for (int i = 0; i < COLUMN; i++) {
+		weights[i] = (double)total[i] / (double)sum;
+	}
+
+	return FindMax(weights, 6);
+}
 
 void Init() {
 	vector<Product>::iterator ptr = arr.begin();
@@ -206,7 +260,7 @@ void SearchProd(SOCKET s2, char* buf) {
 	send(s2, "\0", sizeof("\0"), 0);
 }
 
-void AdminOrder(SOCKET s2){
+void AdminOrder(SOCKET s2) {
 	map<string, vector<Product>>::iterator i = warehouses.find(city);
 
 	char buf[100], amount[100];
@@ -217,13 +271,15 @@ void AdminOrder(SOCKET s2){
 }
 
 void AddToCart(SOCKET s2) {
+	map<string, vector<Product>>::iterator i = warehouses.find(cities[priority]);
+
 	char buf[100], amount[100];
 	recv(s2, buf, sizeof(buf), 0);
 	recv(s2, buf, sizeof(buf), 0);
 	recv(s2, amount, sizeof(amount), 0);
-	int i = atoi(buf);
-	if (!(i < 0 || i > arr.size())) {
-		cart.push_back(arr[i]);
+	int ind = atoi(buf);
+	if (!(ind < 0 || ind > i->second.size())) {
+		cart.push_back(i->second[ind]);
 		cart[cart.size() - 1].SetAmount(amount);
 	}
 }
@@ -253,7 +309,10 @@ void DeleteCart(SOCKET s2) {
 
 DWORD WINAPI ThreadFunc(LPVOID client_socket)
 {
+	srand(time(NULL));
 	Init();
+
+	priority = ExpertMethod();
 
 	int num = numcl;
 	SOCKET s2 = ((SOCKET*)client_socket)[0];
@@ -261,7 +320,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	string _log;
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
-		if (buf[0] == '0') 
+		if (buf[0] == '0')
 		{
 			if (!strcmp(buf, "0_0")) cout << "client N-" << numcl << " unauthorised\n";
 			else if (!strcmp(buf, "0_1")) {
@@ -270,6 +329,11 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				recv(s2, lbuf, 100, 0);
 				recv(s2, lbuf, 100, 0);
 				recv(s2, pbuf, 100, 0);
+
+				if (!strcmp(lbuf, "admin") && !strcmp(pbuf, "admin")) {
+					exist = true;
+					send(s2, "11", sizeof("11"), 0);
+				}
 
 				while (!exist) {
 					string log, pass;
@@ -315,7 +379,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				}
 			}
 		}
-		else if (buf[0] == '1') 
+		else if (buf[0] == '1')
 		{
 			if (!strcmp(buf, "1_1")) AddProd(s2, buf);
 			else if (!strcmp(buf, "1_2")) ShowProdAdmin(s2, buf);
@@ -325,7 +389,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 				AdminOrder(s2);
 			}
 		}
-		else if (buf[0] == '2'){
+		else if (buf[0] == '2') {
 			if (!strcmp(buf, "2_1")) ShowProdUser(s2, buf);
 			else if (!strcmp(buf, "2_2")) SearchProd(s2, buf);
 			else if (!strcmp(buf, "2_31")) ShowCart(s2);
@@ -343,7 +407,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 		}
 		*buf = '\0';
 	}
-	
+
 	Save();
 
 	closesocket(s2);

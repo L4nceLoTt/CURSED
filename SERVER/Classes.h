@@ -3,8 +3,8 @@
 class Product {
 	string code;
 	string cost;
-	string group;
 	string name;
+	string group;
 	string dealer;
 	string amount;
 
@@ -57,3 +57,25 @@ public:
 	}
 	string GetAmount() { return amount; }
 };
+
+//class Oil : public Product{
+//	string group;
+//
+//public:
+//	void SetGroup(string _group) { group = _group; }
+//	string GetGroup() { return group; }
+//};
+//class Conserv : public Product{
+//	string group;
+//
+//public:
+//	void SetGroup(string _group) { group = _group; }
+//	string GetGroup() { return group; }
+//};
+//class Grocery : public Product{
+//	string group;
+//
+//public:
+//	void SetGroup(string _group) { group = _group; }
+//	string GetGroup() { return group; }
+//};
