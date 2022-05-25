@@ -67,6 +67,13 @@ int ExpertMethod() {
 
 	FisherYates(arr1, 6);
 	FisherYates(arr2, 6);
+	cout << "\nИсходная матрица:\n";
+	printf("%5c|%8s|%8s|%8s|%8s|%8s|%8s|\n", ' ', cities[0].c_str(), cities[1].c_str(), cities[2].c_str(), cities[3].c_str(), cities[4].c_str(), cities[5].c_str());
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
+	printf("|%4s|%8d|%8d|%8d|%8d|%8d|%8d|\n", "Э1", arr1[0], arr1[1], arr1[2], arr1[3], arr1[4], arr1[5]);
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
+	printf("|%4s|%8d|%8d|%8d|%8d|%8d|%8d|\n", "Э2", arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5]);
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
 
 	for (int i = 0; i < COLUMN; i++) {
 		arr1[i] = COLUMN - arr1[i];
@@ -74,12 +81,31 @@ int ExpertMethod() {
 		total[i] = arr1[i] + arr2[i];
 		sum += total[i];
 	}
+	cout << "\nМодифицированная матрица:\n";
+	printf("%5c|%8s|%8s|%8s|%8s|%8s|%8s|\n", ' ', cities[0].c_str(), cities[1].c_str(), cities[2].c_str(), cities[3].c_str(), cities[4].c_str(), cities[5].c_str());
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
+	printf("|%4s|%8d|%8d|%8d|%8d|%8d|%8d|\n", "Э1", arr1[0], arr1[1], arr1[2], arr1[3], arr1[4], arr1[5]);
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
+	printf("|%4s|%8d|%8d|%8d|%8d|%8d|%8d|\n", "Э2", arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5]);
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
 
+	cout << "\nСуммарные оценки:\n";
+	printf("%5c|%8s|%8s|%8s|%8s|%8s|%8s|\n", ' ', cities[0].c_str(), cities[1].c_str(), cities[2].c_str(), cities[3].c_str(), cities[4].c_str(), cities[5].c_str());
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
+	printf("|%4s|%8d|%8d|%8d|%8d|%8d|%8d|\n", "Сумма", total[0], total[1], total[2], total[3], total[4], total[5]);
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
 	double* weights = new double[6];
 	for (int i = 0; i < COLUMN; i++) {
 		weights[i] = (double)total[i] / (double)sum;
 	}
 
+	cout << "\nИсходные веса целей:\n";
+	printf("%5c|%8s|%8s|%8s|%8s|%8s|%8s|\n", ' ', cities[0].c_str(), cities[1].c_str(), cities[2].c_str(), cities[3].c_str(), cities[4].c_str(), cities[5].c_str());
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
+	printf("|%4s|%8.4f|%8.4f|%8.4f|%8.4f|%8.4f|%8.4f|\n", "Веса", weights[0], weights[1], weights[2], weights[3], weights[4], weights[5]);
+
+
+	cout << "\nПриоритетная цель - склад в г." << cities[FindMax(weights, 6)] << endl;
 	return FindMax(weights, 6);
 }
 
@@ -322,7 +348,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	{
 		if (buf[0] == '0')
 		{
-			if (!strcmp(buf, "0_0")) cout << "client N-" << numcl << " unauthorised\n";
+			if (!strcmp(buf, "0_0")) cout << "клиент №" << numcl << " вышел из уч.з.\n";
 			else if (!strcmp(buf, "0_1")) {
 				bool exist = false;
 				char lbuf[100], pbuf[100];
@@ -411,18 +437,20 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	Save();
 
 	closesocket(s2);
-	cout << "client N-" << num << " disconnected\n";
+	cout << "клиент №" << num << " отключился\n";
 
 	return 0;
 }
 
 void print()
 {
-	if (numcl) cout << "client N-" << numcl << " connected\n";
-	else printf("No clients connected\n");
+	if (numcl) cout << "клиент №" << numcl << " подключился\n";
+	else printf("нет подключённых клиентов\n");
 }
 
 void main() {
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	int err;
