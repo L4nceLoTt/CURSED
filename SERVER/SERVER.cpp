@@ -92,7 +92,7 @@ int ExpertMethod() {
 	cout << "\nСуммарные оценки:\n";
 	printf("%5c|%8s|%8s|%8s|%8s|%8s|%8s|\n", ' ', cities[0].c_str(), cities[1].c_str(), cities[2].c_str(), cities[3].c_str(), cities[4].c_str(), cities[5].c_str());
 	printf("+----+--------+--------+--------+--------+--------+--------+\n");
-	printf("|%4s|%8d|%8d|%8d|%8d|%8d|%8d|\n", "Сумма", total[0], total[1], total[2], total[3], total[4], total[5]);
+	printf("|%4s|%8d|%8d|%8d|%8d|%8d|%8d|\n", "Сум", total[0], total[1], total[2], total[3], total[4], total[5]);
 	printf("+----+--------+--------+--------+--------+--------+--------+\n");
 	double* weights = new double[6];
 	for (int i = 0; i < COLUMN; i++) {
@@ -103,6 +103,7 @@ int ExpertMethod() {
 	printf("%5c|%8s|%8s|%8s|%8s|%8s|%8s|\n", ' ', cities[0].c_str(), cities[1].c_str(), cities[2].c_str(), cities[3].c_str(), cities[4].c_str(), cities[5].c_str());
 	printf("+----+--------+--------+--------+--------+--------+--------+\n");
 	printf("|%4s|%8.4f|%8.4f|%8.4f|%8.4f|%8.4f|%8.4f|\n", "Веса", weights[0], weights[1], weights[2], weights[3], weights[4], weights[5]);
+	printf("+----+--------+--------+--------+--------+--------+--------+\n");
 
 
 	cout << "\nПриоритетная цель - склад в г." << cities[FindMax(weights, 6)] << endl;
@@ -338,8 +339,6 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	srand(time(NULL));
 	Init();
 
-	priority = ExpertMethod();
-
 	int num = numcl;
 	SOCKET s2 = ((SOCKET*)client_socket)[0];
 	char buf[50];
@@ -371,7 +370,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 						if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
 							send(s2, "11", sizeof("11"), 0);
 							_log = log;
-							cout << "client N-" << num << " authorised like " << "\"" << log << "\"\n" << "";
+							cout << "клиент №" << num << " авторизировался как " << "\"" << log << "\"\n" << "";
 							exist = true;
 							Afile.close();
 							break;
@@ -388,9 +387,10 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 							if (!strcmp(log.c_str(), lbuf) && !strcmp(pass.c_str(), pbuf)) {
 								send(s2, "21", sizeof("21"), 0);
 								_log = log;
-								cout << "client N-" << num << " authorised like " << "\"" << log << "\"\n" << "";
+								cout << "клиент №" << num << " авторизировался как " << "\"" << log << "\"\n" << "";
 								exist = true;
 								Ufile.close();
+								priority = ExpertMethod();
 								break;
 							}
 						}
@@ -399,7 +399,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 
 					if (exist == false) {
 						send(s2, "00", sizeof("00"), 0);
-						cout << "client N-" << num << " failed his authorisation\n";
+						cout << "клиент №" << num << " провалил авторизацию\n";
 						exist = true;
 					}
 				}
