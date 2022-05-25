@@ -190,7 +190,7 @@ void SearchProd(SOCKET s2, char* buf) {
 	for (; ptr != arr.end(); ptr++) {
 		char group[100], name[100], cost[100], state[100];
 		ptr->getFields_to_User(group, name, cost);
-		if (strstr(group, str) || strstr(name, str)) {
+		if (strstr(group, str) || strstr(name, str) || strstr(cost, str)) {
 			send(s2, group, sizeof(group), 0);
 			send(s2, name, sizeof(name), 0);
 			send(s2, cost, sizeof(cost), 0);
