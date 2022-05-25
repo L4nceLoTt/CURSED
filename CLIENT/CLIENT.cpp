@@ -85,6 +85,9 @@ void Unreg() {
 	user.setReg(false, false);
 	unreg = true;
 }
+void NewAcc(SOCKET soc){
+
+}
 
 void SendAdd(SOCKET soc) {
 	Menu menu;
@@ -386,7 +389,7 @@ void main() {
 	dest_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	connect(s, (sockaddr*)&dest_addr, sizeof(dest_addr));
 
-	RegMenu.CreateMenu(1, "Войти"); 
+	RegMenu.CreateMenu(2, "Вход", "Регистрация");
 	UserMenu.CreateMenu(4, "Показать товары", "Поиск", "Корзина", "Выйти из уч.з.");
 	{
 		UserMenu.sub[2].CreateMenu(4, "Посмотреть", "Добавить", "Удалить", "Оплатить");
