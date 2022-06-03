@@ -329,8 +329,24 @@ void DeleteCart(SOCKET s2) {
 	recv(s2, buf, sizeof(buf), 0);
 	recv(s2, buf, sizeof(buf), 0);
 	int i = atoi(buf);
-	if (!(i < 0 || i > arr.size())) {
+	if (!(i < 0 || i > cart.size()) && buf[0] != '_') {
 		cart.erase(cart.begin() + i);
+	}
+}
+
+void DeleteProd(SOCKET s2) {
+	char buf[100];
+	recv(s2, buf, sizeof(buf), 0);
+	recv(s2, buf, sizeof(buf), 0);
+	int i = atoi(buf);
+	if (!(i < 0 || i > arr.size()) && buf[0] != '_') {
+		arr.erase(arr.begin() + i);
+
+		for (int ind = 0; ind < 6; ind++) {
+			map<string, vector<Product>>::iterator ptr = warehouses.find(cities[ind]);
+
+			ptr->second.erase(ptr->second.begin() + i);
+		}
 	}
 }
 
@@ -339,12 +355,14 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 	srand(time(NULL));
 	Init();
 
+	int localpriority = 0;
 	int num = numcl;
 	SOCKET s2 = ((SOCKET*)client_socket)[0];
 	char buf[50];
 	string _log;
 	while (recv(s2, buf, sizeof(buf), 0))
 	{
+		priority = localpriority;
 		if (buf[0] == '0')
 		{
 			if (!strcmp(buf, "0_0")) cout << "клиент №" << numcl << " вышел из уч.з.\n";
@@ -390,7 +408,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 								cout << "клиент №" << num << " авторизировался как " << "\"" << log << "\"\n" << "";
 								exist = true;
 								Ufile.close();
-								priority = ExpertMethod();
+								localpriority = ExpertMethod();
 								break;
 							}
 						}
@@ -408,9 +426,13 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 		else if (buf[0] == '1')
 		{
 			if (!strcmp(buf, "1_1")) AddProd(s2, buf);
-			else if (!strcmp(buf, "1_2")) ShowProdAdmin(s2, buf);
-			else if (!strcmp(buf, "1_31")) ShowProdWarehouse(s2, buf);
-			else if (!strcmp(buf, "1_32")) {
+			else if (!strcmp(buf, "1_2")) {
+				ShowProdAdmin(s2, buf);
+				DeleteProd(s2);
+			}
+			else if (!strcmp(buf, "1_3")) ShowProdAdmin(s2, buf);
+			else if (!strcmp(buf, "1_41")) ShowProdWarehouse(s2, buf);
+			else if (!strcmp(buf, "1_42")) {
 				ShowProdWarehouse(s2, buf);
 				AdminOrder(s2);
 			}

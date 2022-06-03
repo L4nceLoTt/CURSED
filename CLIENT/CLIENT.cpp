@@ -159,6 +159,7 @@ void SendAdd(SOCKET soc) {
 }
 
 void AdminSendShow(SOCKET soc) {
+	counter = 0;
 	system("cls");
 	cout << "+--------+---------------+--------------------------------------------------+-----+---------------+\n";
 	cout << "|   Код  |     Группа    |                     Название                     | Цена|    Постащик   |\n";
@@ -174,6 +175,7 @@ void AdminSendShow(SOCKET soc) {
 			recv(soc, dealer, sizeof(dealer), 0);
 			printf("|%8s|%15s|%50s|%5s|%15s|\n", code, group, name, cost, dealer);
 			cout << "+--------+---------------+--------------------------------------------------+-----+---------------+\n";
+			counter++;
 		}
 		else break;
 	}
@@ -333,6 +335,7 @@ void SendCart(SOCKET soc) {
 	send(soc, _amount, sizeof(_amount), 0);
 }
 void ShowCart(SOCKET soc) {
+	TotCost = 0;
 	system("cls");
 	cout << "+----+---------------+--------------------------------------------------+-----+----------------+\n";
 	cout << "|  № |     Группа    |                     Название                     | Цена|     Кол-во     +\n";
@@ -362,6 +365,7 @@ void DeleteCart(SOCKET soc) {
 	if (choise < 0 || choise > counter) {
 		system("cls");
 		cout << "Такого номера нет!";
+		strcpy(_choise, "_");
 	}
 	else {
 		choise--;
@@ -372,7 +376,23 @@ void DeleteCart(SOCKET soc) {
 void PayCart(SOCKET soc) {
 	printf("%72c|  К оплате  |%9.2f|\n", ' ', TotCost);
 	cout << "                                                                        +------------+---------+\n";
-	TotCost = 0;
+}
+
+void SendDelete(SOCKET soc) {
+	int choise;
+	char _choise[100];
+	cout << "\n\nВыберите позицию: ";
+	cin >> choise;
+	if (choise < 0 || choise > counter) {
+		system("cls");
+		cout << "Такого номера нет!";
+		strcpy(_choise, "_");
+	}
+	else {
+		choise--;
+		_itoa_s(choise, _choise, sizeof(_choise), 10);
+	}
+	send(soc, _choise, sizeof(_choise), 0);
 }
 
 void main() {
@@ -396,10 +416,10 @@ void main() {
 		UserMenu.sub[2].CreateMenu(4, "Посмотреть", "Добавить", "Удалить", "Оплатить");
 		UserMenu.function[3] = Unreg;
 	}
-	AdminMenu.CreateMenu(4, "Добавить наим-ние", "Показать наим-ния", "Склад", "Выйти из уч.з.");
+	AdminMenu.CreateMenu(5, "Добавить наим-ние", "Удалить наим-ние", "Показать наим-ния", "Склад", "Выйти из уч.з.");
 	{
-		AdminMenu.sub[2].CreateMenu(2, "Показать товары", "Заказать товар");
-		AdminMenu.function[3] = Unreg;
+		AdminMenu.sub[3].CreateMenu(2, "Показать товары", "Заказать товар");
+		AdminMenu.function[4] = Unreg;
 	}
 	
 
@@ -434,14 +454,19 @@ void main() {
 			else if (MenuPtr->currentID == "2") {
 				SendRequest(s, "1_" + MenuPtr->currentID);
 				AdminSendShow(s);
+				SendDelete(s);
+			}
+			else if (MenuPtr->currentID == "3") {
+				SendRequest(s, "1_" + MenuPtr->currentID);
+				AdminSendShow(s);
 				_getch();
 			}
-			else if (MenuPtr->currentID == "31") {
+			else if (MenuPtr->currentID == "41") {
 				SendRequest(s, "1_" + MenuPtr->currentID);
 				AdminSendShowWarehouse(s);
 				_getch();
 			}
-			else if (MenuPtr->currentID == "32") {
+			else if (MenuPtr->currentID == "42") {
 				SendRequest(s, "1_" + MenuPtr->currentID);
 				AdminSendShowWarehouse(s);
 				WarehouseOrder(s);
