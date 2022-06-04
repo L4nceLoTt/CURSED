@@ -22,6 +22,7 @@ using namespace std;
 
 int numcl = 0;
 int priority = 0;
+bool isInit = false;
 ifstream Afile;
 ifstream Ufile;
 
@@ -353,7 +354,11 @@ void DeleteProd(SOCKET s2) {
 DWORD WINAPI ThreadFunc(LPVOID client_socket)
 {
 	srand(time(NULL));
-	Init();
+
+	if (!isInit) {
+		Init();
+		isInit = true;
+	}
 
 	int localpriority = 0;
 	int num = numcl;
