@@ -41,14 +41,15 @@ public:
 		strcpy(_amount, amount.c_str());
 	}
 	string GetGroup() { return group; }
-	void AddAmount(char* adding) {
+	string GetName() { return name; }
+	void AddAmount(const char* adding) {
 		char _amount[100];
 		int _adding = atoi(adding);
 		int _amount_ = atoi(amount.c_str());
 		_itoa_s(_adding + _amount_, _amount, sizeof(_amount), 10);
 		amount = _amount;
 	}
-	void SetAmount(char* _amount) {
+	void SetAmount(const char* _amount) {
 		amount = _amount;
 	}
 	bool isExist() {

@@ -223,9 +223,10 @@ void ShowProdAdmin(SOCKET s2, char* buf) {
 	send(s2, "0", sizeof("0"), 0);
 }
 void ShowProdUser(SOCKET s2, char* buf) {
-	vector<Product>::iterator ptr = arr.begin();
+	map<string, vector<Product>>::iterator i = warehouses.find(cities[priority]);
+	vector<Product>::iterator ptr = i->second.begin();
 
-	for (; ptr != arr.end(); ptr++) {
+	for (; ptr != i->second.end(); ptr++) {
 		char group[100], name[100], cost[100], state[100];
 		ptr->getFields_to_User(group, name, cost);
 		send(s2, group, sizeof(group), 0);
@@ -267,9 +268,10 @@ void SearchProd(SOCKET s2, char* buf) {
 	recv(s2, str, sizeof(str), 0);
 	recv(s2, str, sizeof(str), 0);
 
-	vector<Product>::iterator ptr = arr.begin();
+	map<string, vector<Product>>::iterator i = warehouses.find(cities[priority]);
+	vector<Product>::iterator ptr = i->second.begin();
 
-	for (; ptr != arr.end(); ptr++) {
+	for (; ptr != i->second.end(); ptr++) {
 		char group[100], name[100], cost[100], state[100];
 		ptr->getFields_to_User(group, name, cost);
 		if (strstr(group, str) || strstr(name, str) || strstr(cost, str)) {
@@ -332,6 +334,21 @@ void DeleteCart(SOCKET s2) {
 	int i = atoi(buf);
 	if (!(i < 0 || i > cart.size()) && buf[0] != '_') {
 		cart.erase(cart.begin() + i);
+	}
+}
+void PayCart(SOCKET s2) {
+	vector<Product>::iterator ptr = cart.begin();
+
+	map<string, vector<Product>>::iterator i = warehouses.find(cities[priority]);
+	vector<Product>::iterator _ptr = i->second.begin();
+
+	for (; ptr != cart.end(); ptr++) {
+		for (; _ptr != i->second.end(); _ptr++) {
+			if (ptr->GetName() == _ptr->GetName()) {
+				string newAmount = "-" + ptr->GetAmount();
+				_ptr->AddAmount(newAmount.c_str());
+			}
+		}
 	}
 }
 
@@ -456,6 +473,7 @@ DWORD WINAPI ThreadFunc(LPVOID client_socket)
 			}
 			else if (!strcmp(buf, "2_34")) {
 				ShowCart(s2);
+				PayCart(s2);
 			}
 		}
 		*buf = '\0';
